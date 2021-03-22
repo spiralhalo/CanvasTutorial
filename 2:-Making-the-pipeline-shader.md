@@ -65,7 +65,7 @@ It points to shader files that hasn't yet exist. We will be creating those files
 
 # Making the vertex shader
 
-Our first vertex shader would be a very basic one. First, start by adding these lines to the top of `main.vert`:
+Our first vertex shader would be a very basic one. First, start by adding these lines of code at the beginning of `main.vert`:
 
 ```glsl
 #include frex:shaders/api/vertex.glsl
