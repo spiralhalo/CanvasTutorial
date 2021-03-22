@@ -4,7 +4,7 @@ Now that we've set up our G-buffer, it's time to write to it! Before that, we ne
 
 Start by creating the pipeline file in the `pipelines` folder. Canvas will look into this folders for valid pipeline files. We will name ours `tutorial_pipeline.json`. You're free to name yours anything but make sure to keep track of its filename.
 
-The content of this file is the following:
+The content of this file is the following (if you use a unique name for your pack make sure to replace "tutorialpack" with it):
 ```json5
 {
   nameKey: "pipeline.tutorial_pipeline.name",
