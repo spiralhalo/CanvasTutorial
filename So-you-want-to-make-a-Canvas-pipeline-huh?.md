@@ -96,6 +96,8 @@ Next we'll add the depth image into our `images` array. In case you are unfamili
 }
 ```
 
+Note that the depth image has one more `texParams` component called `TEXTURE_COMPARE_MODE`. This is mostly used for shadowmaps. Since we're making a regular depth image, we want to set this to `NONE`.
+
 Finally, we will add these images into our G-buffer. The G-buffer itself is defined as a **Framebuffer** object. The color and depth images that we've created will be attached to the G-buffer framebuffer object.
 
 Just like with the images, we first need to create a `framebuffers` array inside our `main.json` file. The order doesn't matter but we will create it under our images array like this:
