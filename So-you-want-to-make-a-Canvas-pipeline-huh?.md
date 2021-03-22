@@ -2,7 +2,7 @@
 
 It's the same thing! Shader packs are called **Pipelines** in Canvas. Although there are also material shaders pack, which is a different type of shader pack. In other words, there are actually two types of "shader packs" in Canvas:
 * A set of material shaders.
-* A pipeline - consisting of pipeline configuration(s) and pipeline shaders.
+* A Pipeline - consisting of pipeline configuration(s) and pipeline shaders.
 
 Both of these are loaded as minecraft resources contained in a resource pack. A resource pack isn't limited to one type of resource, that means a resource pack can contain both material shaders and pipelines! (That is right, pipelines with an "s".) Confused? You might want to refresh your knowledge on resource packs, but for the sake of this tutorial we're going to focus on **a single resource pack containing a single pipeline** (aka a "shader pack").
 
