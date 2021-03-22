@@ -177,3 +177,11 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   gl_FragDepth = gl_FragCoord.z;
 }
 ```
+
+Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
+
+# Testing your first render
+
+At this point, your pipeline should be complete enough to render something! Try loading the resource pack and go to Video Setting > Canvas and change the pipeline to your tutorial pipeline. If you did everything right up to this point your pipeline should render a basic unshaded minecraft world. Congrats! If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
+
+*> Quick tip: You can try messing with the `color` variable in the fragment shader. Multiply it, add to it, etc. and see how it affects the final image. This is where the fun begins!
