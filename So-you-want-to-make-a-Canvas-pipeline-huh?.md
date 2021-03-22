@@ -6,7 +6,7 @@ It's the same thing! Shader packs are called **Pipelines** in Canvas. Although t
 
 Both of these are loaded as minecraft resources contained in a resource pack. A resource pack isn't limited to one type of resource, that means a resource pack can contain both material shaders and pipelines! (That is right, pipelines with an "s".) Confused? You might want to refresh your knowledge on resource packs, but for the sake of this tutorial we're going to focus on **a single resource pack containing a single pipeline** (aka a "shader pack").
 
-Specifically, we're going to make a **shadow-enabled pipeline** with **volumetric lights** and **translucency compositing**.
+Specifically, we're going to make a **shadow-enabled pipeline** with **volumetric lights** and **translucency compositing** from scratch. That is right, from scratch! Well, almost from scratch due to the code examples, but we won't be using Canvas's default pipeline because the goal of this tutorial is to teach basic understanding of how the entire pipeline works from start to finish.
 
 # First stop - the G-buffer
 
