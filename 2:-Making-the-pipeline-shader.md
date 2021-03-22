@@ -1,4 +1,6 @@
-Now that we've set up our G-buffer, it's time to write to them! Before that, we need to set up some more things, namely **the pipeline itself**.
+# Creating the pipeline file
+
+Now that we've set up our G-buffer, it's time to write to it! Before that, we need to set up some more things, namely **the pipeline itself**.
 
 Start by creating the pipeline file in the `pipelines` folder. Canvas will look into this folders for valid pipeline files. We will name ours `tutorial_pipeline.json`. You're free to name yours anything but make sure to keep track of its filename.
 
