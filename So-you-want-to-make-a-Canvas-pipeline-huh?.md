@@ -1,4 +1,4 @@
-# A pipeline? No, I wanted to make a shader pack!
+# A pipeline? No, I want to make a shader pack!
 
 It's the same thing! Shader packs are called **Pipelines** in Canvas. Although there are also material shaders pack, which is a different type of shader pack. In other words, there are actually two types of "shader packs" in Canvas:
 * A set of material shaders.
