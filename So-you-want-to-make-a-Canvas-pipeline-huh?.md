@@ -10,9 +10,10 @@ Specifically, we're going to make a **shadow-enabled pipeline** with **volumetri
 
 # Table of Contents
 
-### [1: First stop: the G buffer](https://github.com/spiralhalo/CanvasTutorial/wiki/1:-First-stop:-the-G-buffer)
-### [2: Making the pipeline shader](https://github.com/spiralhalo/CanvasTutorial/wiki/2:-Making-the-pipeline-shader)
-### 3: Shading: using vanilla lighting data
+### [[1: First stop: the G buffer|1: First stop: the G buffer]]
+### [[2: Making the pipeline shader|2: Making the pipeline shader]]
+### [[3: Shading: Using vanilla lighting|3: Shading: Using vanilla lighting]]
+### [[3.5: Miscellaneous vanilla effects|3.5: Miscellaneous vanilla effects]]
 ### 4: Adding sky shadows
 ### 5: Adding a volumetric lights pass
 ### 6: Compositing pass and fabulousness
