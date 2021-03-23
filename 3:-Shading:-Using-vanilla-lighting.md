@@ -106,13 +106,153 @@ varying float v_diffuse; // Our new diffuse varying
 Finally, in the **fragment shader**, apply our fake diffuse value to the fragment color. We only do this with objects that are marked as diffuse-enabled:
 
 ```glsl
-  // ... lighting calculation goes before this ...
+  // ... lighting calculation goes here ...
 
   if (fragData.diffuse) {
     color.rgb *= v_diffuse;
   }
 
-  // ... writing to the g-buffer goes after this ...
+  // ... writing to the g-buffer goes here ...
 ```
 
 Now test your shader once again to see if the fake diffuse is applied properly.
+
+# Emissivity
+
+The last step into completing the quasi-vanilla lighting is to apply emissivity. Emissive objects emit light, therefore all the previous lighting and diffuse multiplication shouldn't apply to them. There are various ways to do this, but the simplest way it so simply mix our final color with the original color before any lighting is applied.
+
+First, in the fragment shader, we store the original color in a new variable:
+
+```glsl
+void frx_writePipelineFragment(in frx_FragmentData fragData)
+{
+  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
+  vec4 color = fragData.spriteColor * fragData.vertexColor;
+
+  // Store this unshaded color for later use
+  vec3 original_color = color.rgb;
+
+  // ...
+```
+
+And then, just before writing the color into the G-buffer, we will interpolate the original color based on the emissivity value of this fragment:
+
+```glsl
+  // ... applying diffuse goes here ...
+
+  color.rgb = mix(color.rgb, original_color, fragData.emissivity);
+
+  // ... writing to the g-buffer goes here ...
+```
+
+Once we completed everything in this chapter, our final shader should look like this:
+
+`main.vert`:
+```glsl
+#include frex:shaders/api/vertex.glsl
+#include frex:shaders/api/view.glsl
+
+#ifdef VANILLA_LIGHTING
+  varying vec2 v_light;
+  varying float v_aoShade;
+#endif
+varying float v_diffuse;
+
+void frx_writePipelineVertex(in frx_VertexData data)
+{
+  if (frx_modelOriginType() == MODEL_ORIGIN_SCREEN) {
+    // Position of hand and GUI items
+    gl_Position = gl_ModelViewProjectionMatrix * data.vertex;
+  } else {
+    // Position of world objects
+    data.vertex += frx_modelToCamera();
+    gl_Position = frx_viewProjectionMatrix() * data.vertex;
+  }
+
+  float pointing_up = dot(data.normal, vec3(0.0, 1.0, 0.0));
+  pointing_up = pointing_up * 0.5 + 0.5;
+  v_diffuse = 0.3 + 0.7 * pointing_up;
+
+  #ifdef VANILLA_LIGHTING
+    v_light = data.light;
+    v_aoShade = data.aoShade;
+  #endif
+}
+```
+
+`main.frag`:
+```glsl
+#include frex:shaders/api/material.glsl
+#include frex:shaders/api/fragment.glsl
+
+#ifdef VANILLA_LIGHTING
+  varying vec2 v_light;
+  varying float v_aoShade;
+#endif
+varying float v_diffuse;
+
+// Fragment setup - Most of the time you don't need to modify these
+frx_FragmentData frx_createPipelineFragment()
+{
+#ifdef VANILLA_LIGHTING
+  return frx_FragmentData (
+    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
+    frx_color,
+    frx_matEmissive() ? 1.0 : 0.0,
+    !frx_matDisableDiffuse(),
+    !frx_matDisableAo(),
+    frx_normal,
+    v_light,
+    v_aoShade
+  );
+#else
+  return frx_FragmentData (
+    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
+    frx_color,
+    frx_matEmissive() ? 1.0 : 0.0,
+    !frx_matDisableDiffuse(),
+    !frx_matDisableAo(),
+    frx_normal
+  );
+#endif
+}
+// End of fragment setup
+
+void frx_writePipelineFragment(in frx_FragmentData fragData)
+{
+  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
+  vec4 color = fragData.spriteColor * fragData.vertexColor;
+    
+  // Store this unshaded color for later use
+  vec3 original_color = color.rgb;
+  
+  // Always wrap vanilla lighting operation within #ifdef VANILLA_LIGHTING directive
+  #ifdef VANILLA_LIGHTING
+
+    // Obtain vanilla light color
+    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
+
+    // Multiply it by ambient occlusion factor
+    if (fragData.ao) {
+      light_color *= fragData.aoShade;
+    }
+
+    // Finally, multiply the fragment color by the light color
+    color.rgb *= light_color;
+  #endif
+
+  // Multiply the color once more with the diffuse shading
+  if (fragData.diffuse) {
+    color.rgb *= v_diffuse;
+  }
+
+  // Apply emissivity
+  color.rgb = mix(color.rgb, original_color, fragData.emissivity);
+
+  // Write color data to the color attachment
+  gl_FragData[0] = color;
+  
+  // Write position data to the depth attachment
+  gl_FragDepth = gl_FragCoord.z;
+}
+```
