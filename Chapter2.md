@@ -1,4 +1,6 @@
-# Creating the pipeline file
+# 2: Making the pipeline shader
+
+## Creating the pipeline file
 
 Now that we've set up our G-buffer, it's time to write to it! Before that, we need to set up some more things, namely **the pipeline itself**.
 
