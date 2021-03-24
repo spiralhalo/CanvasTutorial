@@ -1,5 +1,5 @@
 # Chapters
-[[Introduction|So you want to make a Canvas pipeline huh?]]
+[[Introduction|Home]]
 
 [[1: First stop: the G buffer|1: First stop: the G buffer]]
 
