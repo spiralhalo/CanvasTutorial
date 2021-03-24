@@ -1,3 +1,5 @@
+# 1: First stop: the G-buffer
+
 The G-buffer is the bread and butter of configurable pipelines. Think of all the cool effects you want in a shader pack: ssao, godrays, volumetric light, screen space reflection, and so on. All of these start with building the G-buffer. So what is the G-buffer?
 
 The G-buffer ("graphics buffer") is a buffer that describes screen data represented as textures. The G-buffer can contain as much information as the designer desires, but typically some essential components of the G-buffer are:
