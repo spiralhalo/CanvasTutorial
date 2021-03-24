@@ -10,3 +10,5 @@
 [[3.5: Miscellaneous vanilla effects|Chapter 3.5]]
 
 [[4: Adding sky shadows|Chapter 4]]
+
+[[Appendix|Appendix]]

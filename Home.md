@@ -16,8 +16,10 @@ Specifically, we're going to make a **shadow-enabled pipeline** with **volumetri
 ### [[2: Making the pipeline shader|Chapter 2]]
 ### [[3: Shading: Using vanilla lighting|Chapter 3]]
 ### [[3.5: Miscellaneous vanilla effects|Chapter 3.5]]
-### 4: Adding sky shadows
+### [[4: Adding sky shadows|Chapter 4]]
 ### 5: Adding a volumetric lights pass
 ### 6: Compositing pass and fabulousness
 ### 7: Fog pass
 ### Conclusion
+
+### [[Appendix|Appendix]]
