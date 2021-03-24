@@ -184,7 +184,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 
 Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
 
-> **What is a fragment?** A fragment is simply an "unprocessed" pixel! The fragment shader is responsible in processing and writing fragments into the framebuffer before they can be displayed as pixels on the screen or sampled as texture by other shaders further down the pipeline.
+> **What is a fragment?** A fragment is simply an "unprocessed" pixel! The fragment shader is responsible for processing and writing fragments into the framebuffer before they can be displayed as pixels on the screen or sampled as texture by other shaders further down the pipeline.
 
 ## Testing your first render
 
