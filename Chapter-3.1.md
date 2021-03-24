@@ -1,3 +1,5 @@
+# 3.5: Miscellaneous vanilla effects
+
 We've implemented vanilla lighting and make our pipeline playable with, but we still need to apply certain minecraft effects in shader, namely:
 * TNT / thunder Flash
 * Hurt flash
