@@ -264,3 +264,54 @@ The `fragData.light` is a 2-dimensional vector where the `x` value represents th
 Now when you test the pipeline you should see some shadows in the world!
 
 > **Why does my shadow sometimes disappear when I look away?** This is a know Canvas issue. Be patient and wait for it to get fixed.
+
+### Adjusting the fake diffuse
+
+Recall the following fake diffuse calculation in the vertex shader:
+
+```glsl
+  float pointing_up = dot(data.normal, vec3(0.0, 1.0, 0.0));
+  pointing_up = pointing_up * 0.5 + 0.5;
+  v_diffuse = 0.3 + 0.7 * pointing_up;
+```
+
+In this fake diffuse code, we specifically made it so that faces that point up are shaded more brightly. Since we've added shadows, it makes more sense if the faces that **points towards the sky light** are shaded more brightly instead. 
+
+This can be achieved by utilizing the `frx_skyLightVector()` which as the name implies, represents a vector that points towards the skylight. The change to be made is quite straightforward:
+
+```glsl
+  float pointing_to_light = dot(data.normal, frx_skyLightVector());
+```
+
+However, there is a precaution that comes with this. First of all, not all dimensions have a sky light source. Secondly, we still want GUI items to use the original fake diffuse. Therefore, we will add some checks so that the final code will look like this:
+
+```glsl
+  float pointing_to_light;
+  if (frx_worldFlag(FRX_WORLD_HAS_SKYLIGHT) && !frx_isGui()) {
+    pointing_to_light = dot(data.normal, frx_skyLightVector());
+  } else {
+    pointing_to_light = dot(data.normal, vec3(0.0, 1.0, 0.0));
+  }
+  pointing_to_light = pointing_to_light * 0.5 + 0.5;
+  v_diffuse = 0.3 + 0.7 * pointing_to_light;
+```
+
+Last but not least, we need to import the Frex World API in order to access the `frx_worldFlag` and `frx_skyLightVector` functions. We add the following item to our list of `include`s at the beginning of the vertex shader file:
+
+```glsl
+#include frex:shaders/api/world.glsl
+```
+
+### Bonus Step
+
+While testing you might notice some flickering, or "shadow acne" on the side of blocks. This is because the sky angle aligns completely to the east/west axis and have a hard time prioritizing the south/north faces, a limitation in our computers' precision.
+
+To remedy this, Canvas allow pipeline configuration to tilt the sky light zenith by an angle. To do this, add the following item in your pipeline configuration:
+
+```glsl
+  sky: {
+    defaultZenithAngle: 15
+  }
+```
+
+You can add this item in the pipeline json or the sky shadow configuration json, whichever makes more sense to you.
