@@ -8,3 +8,5 @@
 [[3: Shading: Using vanilla lighting|Chapter 3]]
 
 [[3.5: Miscellaneous vanilla effects|Chapter 3.5]]
+
+[[4: Adding sky shadows|Chapter 4]]
