@@ -63,7 +63,7 @@ It points to shader files that hasn't yet exist. We will be creating those files
 1. Inside the `shaders` folder, create a folder called `gbuffer`. This will be the place where we put all our G-buffer-related shaders.
 2. Inside the `gbuffer` folder, create the files `main.vert` and `main.frag`. These will be our pipeline vertex and fragment shader files respectively.
 
-*> Quick note: What is a shader "program"? A shader program consists of a vertex and a fragment shader!
+> **Quick note:** What is a shader "program"? A shader program consists of a vertex and a fragment shader!
 
 ## Making the vertex shader
 
@@ -186,9 +186,11 @@ Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for wri
 
 At this point, your pipeline should be complete enough to render something! Try loading the resource pack and go to Video Setting > Canvas and change the pipeline to your tutorial pipeline. If you did everything right up to this point your pipeline should render a basic unshaded minecraft world. Congrats! If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
 
-*> Quick tip: You can try messing with the `color` variable in the fragment shader. Multiply it, add to it, etc. and see how it affects the final image. This is where the fun begins!
+> **Quick tip:** You can try messing with the `color` variable in the fragment shader. Multiply it, add to it, etc. and see how it affects the final image. This is where the fun begins!
 
-*> Bonus step: You might notice that your pipeline is named gibberish when selecting it from the pipeline selection. You can change the displayed name by creating a language file containing the name and description keys of your pipeline. For example:
+## Bonus step
+
+You might notice that your pipeline is named gibberish when selecting it from the pipeline selection. You can change the displayed name by creating a language file containing the name and description keys of your pipeline. For example:
 ```json
 "pipeline.tutorial_pipeline.name": "My Pipeline",
 "pipeline.tutorial_pipeline.desc": "A pipeline made of hopes and dreams"

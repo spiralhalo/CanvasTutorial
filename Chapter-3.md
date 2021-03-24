@@ -59,7 +59,7 @@ Once we close the `#ifdef` directive, our whole lighting operation will look lik
 
 You can test your pipeline to see if everything is rendering as expected.
 
-*> Pro-tip: Press `F3+A` to trigger chunk reload which will also recompile your pipeline! You can also set Canvas reload shortcut key in Controls option.
+> **Pro-tip:** Press `F3+A` to trigger chunk reload which will also recompile your pipeline! You can also set Canvas reload shortcut key in Controls option.
 
 ## Non-flat lighting trick: Fake diffuse
 
