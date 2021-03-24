@@ -61,7 +61,7 @@ You can test your pipeline to see if everything is rendering as expected.
 
 *> Pro-tip: Press `F3+A` to trigger chunk reload which will also recompile your pipeline! You can also set Canvas reload shortcut key in Controls option.
 
-# Non-flat lighting trick: Fake diffuse
+## Non-flat lighting trick: Fake diffuse
 
 Now that we've applied the lighting data, you may notice that the lighting still looks somewhat flat. That is because minecraft light data doesn't contain directional value, so every faces of an object are lit uniformly. The solution to this is simply to fake the directional lighting by lighting the sides of objects less than the top.
 
@@ -119,7 +119,7 @@ Finally, in the **fragment shader**, apply our fake diffuse value to the fragmen
 
 Now test your shader once again to see if the fake diffuse is applied properly.
 
-# Emissivity
+## Emissivity
 
 The last step into completing the quasi-vanilla lighting is to apply emissivity. Emissive objects emit light, therefore all the previous lighting and diffuse multiplication shouldn't apply to them. There are various ways to do this, but the simplest way it so simply mix our final color with the original color before any lighting is applied.
 

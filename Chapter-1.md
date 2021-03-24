@@ -11,7 +11,7 @@ The G-buffer ("graphics buffer") is a buffer that describes screen data represen
 
 For this tutorial we only need the **color** and **depth** informations in our G-buffer.
 
-# Setting up your project
+## Setting up your project
 
 Since a Canvas pipeline lives in a resource pack, begin by making a folder containing your resource pack. It's recommended to do it in the resourcepacks folder of the minecraft instance with Canvas installed so you may test your pipeline immediately.
 
@@ -33,7 +33,7 @@ You may name the folder `tutorialpack` with any pack name you want as long as it
 
 Another thing to note, the folders `pipeline_files` and `shaders` also don't have naming constraints. These are however the names that are used in Canvas's default pack so using the same naming system would make it easier to look things up inside Canvas's source code. (NB: Canvas actually use `pipeline` instead of `pipeline_files` but this is confusing due to the mandatory `pipelines` folder. Hence we will use `pipeline_files` for this tutorial.)
 
-# Defining the G-buffer
+## Defining the G-buffer
 
 Remember that our G-buffer consists of color and depth information. In the pipeline configuration, these will be defined as **Images** which are pipeline objects that represent textures in the back end.
 

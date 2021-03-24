@@ -2,7 +2,7 @@
 
 ## Creating the pipeline file
 
-Now that we've set up our G-buffer, it's time to write to it! Before that, we need to set up some more things, namely **the pipeline itself**.
+Now that we've set up our G-buffer, it's time to write to it! Before that, we need to set up some more things, namely **the pipeline itself**. I know that it sounds weird to start with a framebuffer before the pipeline itself, but the pipeline setup is pretty boring. You'll see.
 
 Start by creating the pipeline file in the `pipelines` folder. Canvas will look into this folders for valid pipeline files. We will name ours `tutorial_pipeline.json`. You're free to name yours anything but make sure to keep track of its filename.
 
@@ -47,7 +47,7 @@ The content of this file is the following (if you use a unique name for your pac
 }
 ```
 
-Now that's a lot of copy paste. The content of this file should be self explanatory and there isn't much point going through it step by step, but the important bit is that we are pointing the default render targets to the gbuffer that we have set up before! That means whenever Canvas renders something the data will be stored in our gbuffer.
+Now that's a lot of copy paste. The content of this file should be self explanatory and there isn't much point going through it step by step. The important bit is that we are pointing the default render targets to the G-buffer that we have set up before! That means whenever Canvas renders something the data will be stored in our G-buffer.
 
 Another important bit is this part:
 
@@ -58,14 +58,14 @@ fragmentSource: "tutorialpack:shaders/gbuffer/main.frag"
 
 It points to shader files that hasn't yet exist. We will be creating those files before we can write our pipeline shader.
 
-## Creating the pipeline shader files
+### Creating the pipeline shader files
 
 1. Inside the `shaders` folder, create a folder called `gbuffer`. This will be the place where we put all our G-buffer-related shaders.
 2. Inside the `gbuffer` folder, create the files `main.vert` and `main.frag`. These will be our pipeline vertex and fragment shader files respectively.
 
 *> Quick note: What is a shader "program"? A shader program consists of a vertex and a fragment shader!
 
-# Making the vertex shader
+## Making the vertex shader
 
 Our first vertex shader would be a very basic one. First, start by adding these lines of code at the beginning of `main.vert`:
 
@@ -114,7 +114,7 @@ Specifically, the data being written are **vertex positions** and vanilla lighti
 
 The concept of model-view-projection matrix is too complex to be explained in this part of the tutorial. We will revisit them later when we begin working on the volumetric light pass.
 
-# Making the fragment shader
+## Making the fragment shader
 
 This time we will work on the `main.frag` file. Just like before, we begin by importing necessary libraries:
 
@@ -182,7 +182,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 
 Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
 
-# Testing your first render
+## Testing your first render
 
 At this point, your pipeline should be complete enough to render something! Try loading the resource pack and go to Video Setting > Canvas and change the pipeline to your tutorial pipeline. If you did everything right up to this point your pipeline should render a basic unshaded minecraft world. Congrats! If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
 
