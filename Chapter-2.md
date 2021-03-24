@@ -76,16 +76,16 @@ Our first vertex shader would be a very basic one. First, start by adding these 
 
 These will import frex shaders api that are responsible for vertex data and view transformations. We will always need these in a vertex shader on the G-buffer pass. We will learn about other types of passes such as shadow pass and full frame pass later on.
 
-Next, we want the following lines of code:
+Next, we want to define the following outputs:
 
 ```glsl
 #ifdef VANILLA_LIGHTING
-  varying vec2 v_light;
-  varying float v_aoShade;
+  out vec2 v_light;
+  out float v_aoShade;
 #endif
 ```
 
-These are used to transport vanilla light and ambient occlusion data to be used later on when being working on the shading.
+These are used to output vanilla light and ambient occlusion data to be used later on when being working on the shading.
 
 And finally, we want to put a "vertex write function" into our vertex shader. This function looks like this:
 
@@ -102,6 +102,7 @@ void frx_writePipelineVertex(in frx_VertexData data)
   }
 
   #ifdef VANILLA_LIGHTING
+    // Write the light data output
     v_light = data.light;
     v_aoShade = data.aoShade;
   #endif
@@ -125,12 +126,12 @@ This time we will work on the `main.frag` file. Just like before, we begin by im
 #include frex:shaders/api/fragment.glsl
 ```
 
-Then we will define the variables that will contain vanilla lighting data written by the vertex shader, same as before:
+Then we will define the inputs that will receive vanilla lighting data written by the vertex shader, same as before but with `in` keyword instead:
 
 ```glsl
 #ifdef VANILLA_LIGHTING
-  varying vec2 v_light;
-  varying float v_aoShade;
+  in vec2 v_light;
+  in float v_aoShade;
 #endif
 ```
 

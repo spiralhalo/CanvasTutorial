@@ -145,13 +145,17 @@ Now that we've set up the sky shadow configuration, a shadow map will be generat
 
 To sample the shadow map we need the coordinates of an object in the **shadow-space**. This is where the shadow transformations will come in handy.
 
-First, we will create a new `varying` both in our vertex and fragment shaders (Remember, these are the `main.vert` and `main.frag` files):
+First, we will create a new input/ouput both in our vertex and fragment shaders (Remember, these are the `main.vert` and `main.frag` files):
 
 ```glsl
-varying vec4 v_shadowViewPos;
+// Vertex shader
+out vec4 v_shadowViewPos;
+
+// Fragment shader
+in vec4 v_shadowViewPos;
 ```
 
-Next, just after the camera transformations in the **vertex shader**, we will calculate the shadow view-space coordinate and store it in our new varying:
+Next, just after the camera transformations in the **vertex shader**, we will calculate the shadow view-space coordinate and write it into the new output:
 
 ```glsl
   // ... camera trasnformation goes here ...

@@ -89,20 +89,19 @@ Note that the result of a unit-vector dot product is in the range of [-1, 1]. We
   pointing_up = pointing_up * 0.5 + 0.5;
 ```
 
-Finally, we store this value in a diffuse varying. To prevent absolute darkness, let's pad this value by 0.3. The calculation will look like this:
+Finally, we write this value into a diffuse output. To prevent absolute darkness, let's pad this value by 0.3. The calculation will look like this:
 
 ```glsl
   v_diffuse = 0.3 + 0.7 * pointing_up;
 ```
 
-Don't forget to define the new varying at the beginning of both the vertex and fragment shader:
-```
-// Do this in both vertex and fragment shader
-#ifdef VANILLA_LIGHTING
-  varying vec2 v_light;
-  varying float v_aoShade;
-#endif
-varying float v_diffuse; // Our new diffuse varying
+Don't forget to define the new input/output at the beginning of both the vertex and fragment shader:
+```glsl
+// Vertex shader
+out float v_diffuse; // Our new diffuse vertex output
+
+// Fragment shader
+in float v_diffuse; // Our new diffuse fragment input
 ```
 
 Finally, in the **fragment shader**, apply our fake diffuse value to the fragment color. We only do this with objects that are marked as diffuse-enabled:
@@ -155,10 +154,10 @@ Once we completed everything in this chapter, our final shader should look like 
 #include frex:shaders/api/view.glsl
 
 #ifdef VANILLA_LIGHTING
-  varying vec2 v_light;
-  varying float v_aoShade;
+  out vec2 v_light;
+  out float v_aoShade;
 #endif
-varying float v_diffuse;
+out float v_diffuse;
 
 void frx_writePipelineVertex(in frx_VertexData data)
 {
@@ -188,10 +187,10 @@ void frx_writePipelineVertex(in frx_VertexData data)
 #include frex:shaders/api/fragment.glsl
 
 #ifdef VANILLA_LIGHTING
-  varying vec2 v_light;
-  varying float v_aoShade;
+  in vec2 v_light;
+  in float v_aoShade;
 #endif
-varying float v_diffuse;
+in float v_diffuse;
 
 // Fragment setup - Most of the time you don't need to modify these
 frx_FragmentData frx_createPipelineFragment()
