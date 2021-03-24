@@ -1,4 +1,6 @@
-# Applying vanilla lighting and ambient occlusion
+# 3: Shading: Using vanilla lighting
+
+## Applying vanilla lighting and ambient occlusion
 
 If you've followed this tutorial so far, you should have a working pipeline that renders unshaded minecraft world. Now let's add some lighting to make it more playable.
 
