@@ -114,6 +114,8 @@ Specifically, the data being written are **vertex positions** and vanilla lighti
 
 The concept of model-view-projection matrix is too complex to be explained in this part of the tutorial. We will revisit them later when we begin working on the volumetric light pass.
 
+> **What is a vertex?** A vertex in the context of rendering is an abstract object that makes up the corners of a triangle. A vertex contains positional information, but it can also contain other information added by the renderer such as normals. The vertex shader is responsible for transforming these information and passing them on to the intermediate stage between the vertex and fragment stages.
+
 ## Making the fragment shader
 
 This time we will work on the `main.frag` file. Just like before, we begin by importing necessary libraries:
@@ -181,6 +183,8 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 ```
 
 Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
+
+> **What is a fragment?** A fragment is simply an "unprocessed" pixel! The fragment shader is responsible in processing and writing fragments into the framebuffer before they can be displayed as pixels on the screen or further processed by post-processing shader.
 
 ## Testing your first render
 
