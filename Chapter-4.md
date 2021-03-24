@@ -247,7 +247,13 @@ The `fragData.light` is a 2-dimensional vector where the `x` value represents th
   vec3 shadowTexCoord = shadowPos.xyz * 0.5 + 0.5;
 
   // Sample the shadow map
-  float directSkyLight = shadow2DArray(frxs_shadowMap, shadowTexCoord, float(cascade));
+  float directSkyLight = shadow2DArray(frxs_shadowMap, vec4(shadowTexCoord.xy, float(cascade), shadowTexCoord.z)).r;
+
+  // Pad the value to prevent absolute darkness
+  directSkyLight = 0.3 + 0.7 * directSkyLight;
+
+  // Clip to 0.96875 because of how light map works
+  directSkyLight = min(0.96875, directSkyLight);
 
   // Replace the sky light
   fragData.light.y = directSkyLight;
