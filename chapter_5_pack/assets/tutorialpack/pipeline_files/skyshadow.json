@@ -1,0 +1,48 @@
+{
+  sky: {
+    defaultZenithAngle: 15
+  },
+
+  skyShadows: {
+    framebuffer: "shadow",
+    allowEntities: true,
+    allowParticles: true,
+    supportForwardRender: true,
+    vertexSource: "tutorialpack:shaders/gbuffer/shadow.vert",
+    fragmentSource: "tutorialpack:shaders/gbuffer/shadow.frag",
+    // first parameter to glPolygonOffset - variable slope factor
+    offsetSlopeFactor: 1.1,
+    // second parameter to glPolygonOffset - constant offset bias
+    offsetBiasUnits: 4.0,
+    // In-world radii of next-to-lowest to highest detail cascades.
+    cascadeRadius: [32, 16, 8]
+  },
+
+  images: [
+    // depth attachment for shadow map
+    {
+      name: "shadow_map",
+      size: 1024,
+      internalFormat: "DEPTH_COMPONENT32",
+      pixelFormat: "DEPTH_COMPONENT",
+      pixelDataType: "FLOAT",
+      target: "TEXTURE_2D_ARRAY",
+      depth: 4,
+      texParams: [
+        {name: "TEXTURE_MIN_FILTER", val: "LINEAR"},
+        {name: "TEXTURE_MAG_FILTER", val: "LINEAR"},
+        {name: "TEXTURE_WRAP_S", val: "CLAMP"},
+        {name: "TEXTURE_WRAP_T", val: "CLAMP"},
+        {name: "TEXTURE_COMPARE_MODE", val: "COMPARE_REF_TO_TEXTURE"},
+        {name: "TEXTURE_COMPARE_FUNC", val: "LEQUAL"}
+      ]
+    }
+  ],
+
+  framebuffers: [
+    {
+      name: "shadow",
+      depthAttachment: {image: "shadow_map", clearDepth: 1.0}
+    }
+  ]
+}
