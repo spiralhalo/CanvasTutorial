@@ -67,6 +67,7 @@
   include: [
     "tutorialpack:pipeline_files/main.json",
     "tutorialpack:pipeline_files/skyshadow.json",
+    "tutorialpack:pipeline_files/fabulous_layers.json",
     "tutorialpack:pipeline_files/composite.json",
     "tutorialpack:pipeline_files/passes.json",
   ]
