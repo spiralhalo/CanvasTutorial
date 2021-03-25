@@ -193,7 +193,7 @@ At this point, your pipeline should be complete enough to render something! Try 
 
 If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
 
-Don't worry, this will likely happen often regardless of how advanced you are at shader development. Let's get Canvas to aid us with debugging to make our lives easier. Go to Canvas setting, scroll down to the bottom section and enable the option that says "Shader debug output". Now every time your shader is compiled, a folder called `canvas_shader_debug` will be created inside your `.minecraft` folder. Depending on whether your shader compiles successfully or not, a `failed` subfolder may be created as well to contain all the compilation error messages.
+Don't worry, this will likely happen often regardless of how advanced you are at shader development. Let's get Canvas to aid us with debugging to make our lives easier. Go to Canvas setting, scroll down to the bottom section and enable the option that says **Enable Shader Debug Output**. Now every time your shader is compiled, a folder called `canvas_shader_debug` will be created inside your `.minecraft` folder. Depending on whether your shader compiles successfully or not, a `failed` subfolder may be created as well to contain all the compilation error messages.
 
 > **Quick tip:** You can try messing with the `color` variable in the fragment shader. Multiply it, add to it, etc. and see how it affects the final image. This is where the fun begins!
 
