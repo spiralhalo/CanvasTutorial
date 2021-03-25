@@ -6,24 +6,28 @@ If you've followed this tutorial so far, you should have a working pipeline that
 
 All shading process will happen in our pipeline fragment shader. For optimization we can move this process into a deferred shading pass later, but for now we will do it in the G-buffer pass for simplicity. Another advantage for doing it in the G-buffer pass is that the shading will be applied to all objects including objects behind translucent layer.
 
-To apply the lighting, we first need to convert the vanilla lighting data into light color by sampling the vanilla lightmap texture. We will do it right after color calculation in our fragment shader:
+To apply the lighting, we will add a lighting operation block inside the write pipeline fragment function in our fragment shader. We will add it right after color calculation:
 
 ```glsl
 // main.frag
 // ...
 
+// This is the function that we've created earlier
 void frx_writePipelineFragment(in frx_FragmentData fragData)
 {
-  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
   vec4 color = fragData.spriteColor * fragData.vertexColor;
   
-  // Always wrap vanilla lighting operation within #ifdef VANILLA_LIGHTING directive
+  // ... Lighting operation code goes here ...
+```
+
+First we start the lighting operation by sampling the light map using the light coordinates input:
+
+```glsl
+  // Always wrap vanilla lighting-related operation within #ifdef VANILLA_LIGHTING directive
   #ifdef VANILLA_LIGHTING
 
-    // Obtain vanilla light color
+    // Obtain vanilla light color from the light map
     vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
-
-    // ...
 ```
 
 Next we will multiply the light color with the ambient occlusion factor. We only do it for objects with ambient occlusion enabled:
