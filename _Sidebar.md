@@ -11,4 +11,6 @@
 
 [[4: Adding sky shadows|Chapter 4]]
 
+[[5: Compositing and advanced translucency|Chapter 5]]
+
 [[Appendix|Appendix]]
