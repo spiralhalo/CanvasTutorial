@@ -189,7 +189,11 @@ Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for wri
 
 ## Testing your first render
 
-At this point, your pipeline should be complete enough to render something! Try loading the resource pack and go to Video Setting > Canvas and change the pipeline to your tutorial pipeline. If you did everything right up to this point your pipeline should render a basic unshaded minecraft world. Congrats! If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
+At this point, your pipeline should be complete enough to render something! Try loading the resource pack and go to Video Setting > Canvas and change the pipeline to your tutorial pipeline. If you did everything right up to this point your pipeline should render a basic unshaded minecraft world. Congrats!
+
+If it won't render anything meaningful, or if your pipeline isn't detected then you might need to retrace your steps in case you were missing a semi-colon somewhere...
+
+Don't worry, this will likely happen often regardless of how advanced you are at shader development. Let's get Canvas to aid us with debugging to make our lives easier. Go to Canvas setting, scroll down to the bottom section and enable the option that says "Shader debug output". Now every time your shader is compiled, a folder called `canvas_shader_debug` will be created inside your `.minecraft` folder. Depending on whether your shader compiles successfully or not, a `failed` subfolder may be created as well to contain all the compilation error messages.
 
 > **Quick tip:** You can try messing with the `color` variable in the fragment shader. Multiply it, add to it, etc. and see how it affects the final image. This is where the fun begins!
 
