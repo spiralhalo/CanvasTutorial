@@ -11,7 +11,7 @@ This is quite an elaborate process, so for the first time, we will divide the co
 1. Setting up fabulous graphics and composite passes
 2. Coding the vertex and fragment shaders for the composite passes
 
-# 5.1: Setting up fabulous graphics and composite passes
+# 5-1: Setting up fabulous graphics and composite passes
 
 ## Setting up the pipeline to render to multiple layers
 

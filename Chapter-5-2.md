@@ -1,5 +1,5 @@
 
-# 5.2: Coding the vertex and fragment shaders for the composite passes
+# 5-2: Coding the vertex and fragment shaders for the composite passes
 
 Let's create a new folder called `post` in our `shaders` folder. This will contain shader files for frame passes and separate them from the G-buffer pass shaders.
 

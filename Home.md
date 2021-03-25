@@ -15,11 +15,11 @@ Specifically, we're going to make a **shadow-enabled pipeline** with **volumetri
 ### [[1: First stop: the G buffer|Chapter 1]]
 ### [[2: Making the pipeline shader|Chapter 2]]
 ### [[3: Shading: Using vanilla lighting|Chapter 3]]
-### [[3.5: Miscellaneous vanilla effects|Chapter 3.5]]
+### [[3-α: Miscellaneous vanilla effects|Chapter 3-α]]
 ### [[4: Adding sky shadows|Chapter 4]]
 ### [[5: Compositing and advanced translucency|Chapter 5.1]]
-#### [[5.1: Setting up fabulous graphics and composite passes|Chapter 5.1]]
-#### [[5.2: Coding the vertex and fragment shaders for the composite passes|Chapter 5.2]]
+#### [[5-1: Setting up fabulous graphics and composite passes|Chapter 5-1]]
+#### [[5-2: Coding the vertex and fragment shaders for the composite passes|Chapter 5-2]]
 ### 6: Volumetric lighting
 ### Conclusion
 
