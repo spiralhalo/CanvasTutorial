@@ -1,5 +1,7 @@
 # 5: Adding a volumetric lighting pass
 
+**ABORT SHIP WE NEED TO START WITH COMPOSITE FIRST**
+
 One great thing about having a shadow map is that we could now implement volumetric lighting in addition to shadows.
 
 It's also the part where we will add a post-effect pass into our pipeline. Also known as a **full-frame pass**, because in this pass we will no longer be working with raw world geometry; we only have the **frame data** that has been written to the G-buffer to work with. It is where the G-buffer shines!

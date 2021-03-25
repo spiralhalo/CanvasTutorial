@@ -18,7 +18,8 @@ Whilst *implementing* fabulous graphics is an elaborate process, *enabling* it i
     translucent: "main_gbuffer"
   }
 ```
-This item defines a whole new set of targets for the different layers. We don't need to worry about the actual targets for now as we simply want to enable the fabulous pass. We will discuss it in the next section.
+
+This item defines a whole new set of targets for the different layers. We don't need to worry about the actual targets for now as we simply want to enable the fabulous pass. Do keep in mind that since we didn't implement fabulous graphics completely, some glitch may occur but it will be fixed once we implemented advanced translucency in chapter 6.
 
 ## Setting up a full frame pass for our volumetric lighting
 
