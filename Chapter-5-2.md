@@ -1,5 +1,5 @@
 
-# 5-2: Coding the vertex and fragment shaders for the composite passes
+# 5-2: Writing the vertex and fragment shaders for the composite passes
 
 Let's create a new folder called `post` in our `shaders` folder. This will contain shader files for frame passes and separate them from the G-buffer pass shaders.
 
@@ -66,7 +66,7 @@ void main()
 
 All this shader does is sample the source texture using the texture coordinates input from the vertex shader and then writing it into the color attachment. Simple!
 
-### Coding the composite fragment shader
+### Writing the composite fragment shader
 
 Finally, we got to the closing event of this whole chapter: the composite shader itself.
 

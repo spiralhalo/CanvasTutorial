@@ -9,7 +9,7 @@ Basically, fabulous graphics mode let us render translucent objects to separate 
 This is quite an elaborate process, so for the first time, we will divide the content of this chapter into subchapters:
 
 1. Setting up fabulous graphics and composite passes
-2. Coding the vertex and fragment shaders for the composite passes
+2. Writing the vertex and fragment shaders for the composite passes
 
 # 5-1: Setting up fabulous graphics and composite passes
 
