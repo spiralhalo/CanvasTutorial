@@ -413,8 +413,8 @@ Next, we will create the insertion sort function. There is nothing particularly 
 
 void insert_sort(vec4 color, float depth)
 {
+  // Filter out fully transparent pixel
   if (color.a == 0.0) {
-    // Don't need to blend nothingness, exit the function
     return;
   }
 
@@ -455,14 +455,19 @@ void insert_sort(vec4 color, float depth)
 // ... void main() goes here ...
 ```
 
-And now we sort the layers in `main()`:
+And now we sort the layers in `main()`. Note that the solid layer is special because we always want it to be in the array regardless of filtering:
 
 ```glsl
 void main()
 {
   // ... sampling code goes here ...
 
-  insert_sort(main_color, main_depth);
+  // The solid layer is special. We don't want it to be
+  // potentially rejected by the function.
+  color_values[0] = main_color;
+  depth_values[0] = main_depth;
+  current_length = 1;
+
   insert_sort(translucent_color, translucent_depth);
   insert_sort(entity_color, entity_depth);
   insert_sort(weather_color, weather_depth);
