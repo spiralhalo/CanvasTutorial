@@ -6,7 +6,7 @@ If you've followed this tutorial so far, you should have a working pipeline that
 
 All shading process will happen in our pipeline fragment shader. For optimization we can move this process into a deferred shading pass later, but for now we will do it in the G-buffer pass for simplicity. Another advantage for doing it in the G-buffer pass is that the shading will be applied to all objects including objects behind translucent layer.
 
-To apply the lighting, we will add a lighting operation block inside the write pipeline fragment function in our fragment shader. We will add it right after color calculation:
+To apply the lighting, we will add a lighting operation block inside the write pipeline fragment function in our fragment shader. We will add it right after color calculation as shown here:
 
 ```glsl
 // main.frag
@@ -17,7 +17,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 {
   vec4 color = fragData.spriteColor * fragData.vertexColor;
   
-  // ... Lighting operation code goes here ...
+  // LIGHTING OPERATION CODE GOES HERE
 ```
 
 First we start the lighting operation by sampling the light map using the light coordinates input:
