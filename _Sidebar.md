@@ -11,6 +11,10 @@
 
 [[4: Adding sky shadows|Chapter 4]]
 
-[[5: Compositing and advanced translucency|Chapter 5]]
+[[5: Compositing and advanced translucency|Chapter 5.1]]
+
+[[5.1: Setting up fabulous graphics and composite passes|Chapter 5.1]]
+
+[[5.2: Coding the vertex and fragment shaders for the composite passes|Chapter 5.2]]
 
 [[Appendix|Appendix]]
