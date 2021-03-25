@@ -518,4 +518,6 @@ Finally, we write the composite color into the framebuffer:
 
 Your pipeline is now *fabulous*! Now test it and see if clouds and particles render behind stained glass and water.
 
-If your pipeline fail to compile, check to see if you created the images and framebuffers for the layers properly. You can also obtain the source code of this tutorial up to this point by cloning this tutorial wiki (the wiki, not the main repo. You can get the `.git` url in the sidebar.) This will be our little secret :)
+If your pipeline fail to compile, check to see if you created the images and framebuffers for the layers properly.You can also obtain the source code of this tutorial up to this point by cloning this tutorial wiki (the wiki, not the main repo. You can get the `.git` url in the sidebar.) This will be our little secret.
+
+![winktater](winktater.png)
