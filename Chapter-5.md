@@ -166,6 +166,8 @@ In this file, let's create arrays to store our images, framebuffers, and program
 
 At this point you should know how to create images and framebuffers. Create a color image called `composite_result` and a framebuffer called `composite` with `composite_result` attached as a color attachment. We don't need a depth attachment here. As a matter of fact, frame passes can't write into depth attachment anyway (I tried...)
 
+We also don't want the copy program to render to the G-buffer directly. Therefore, let's make a framebuffer called `copy_to_main` and set the color attachment to `main_color`.
+
 Next, we will create the composite and copy programs. The copy program isn't necessarily composite-related, so you might move it out into a `utility.json` file if you want.
 
 Either way, our programs look like this:
@@ -210,44 +212,61 @@ Finally, we will import the `composite.json` file (and optionally `utility.json`
 
 This part should logically go last, but as it's pretty simple, let's get this out of the way first before we get into writing the shader codes.
 
-Add this item after `beforeWorldRender` in `tutorial_pipeline.json`:
+Let's create a file called `passes.json` in `pipeline_files`. We will store post-effect passes here to prevent making the main pipeline file too bloated as we keep adding post-effect passes later on.
+
+This will be the content of this file:
 
 ```json5
-fabulous: {
-  passes: [
-    // The composite pass
-    {
-      name: "composite",
-      program: "composite",
-      framebuffer: "composite",
-      samplerImages: [
-        "main_color",
-        "main_depth",
-        "translucent_color",
-        "translucent_depth",
-        "entity_color",
-        "entity_depth",
-        "weather_color",
-        "weather_depth",
-        "clouds_color",
-        "clouds_depth",
-        "particles_color",
-        "particles_depth"
-      ]
-    },
+{
+  fabulous: {
+    passes: [
+      // The composite pass
+      {
+        name: "composite",
+        program: "composite",
+        framebuffer: "composite",
+        samplerImages: [
+          "main_color",
+          "main_depth",
+          "translucent_color",
+          "translucent_depth",
+          "entity_color",
+          "entity_depth",
+          "weather_color",
+          "weather_depth",
+          "clouds_color",
+          "clouds_depth",
+          "particles_color",
+          "particles_depth"
+        ]
+      },
 
-    // The copy pass
-    {
-      name: "copy",
-      program: "copy",
-      framebuffer: "main_gbuffer", // draws to solid layer
-      samplerImages: ["composite_result"]
-    }
-  ]
+      // The copy pass
+      {
+        name: "copy",
+        program: "copy",
+        framebuffer: "copy_to_main",
+        samplerImages: ["composite_result"]
+      }
+    ]
+  }
 }
 ```
 
 This code defines and adds the composite and copy passes to the `fabulous` stage. Take a long hard look at this code and try to discern what each part means. It should all come together without explanation necessary.
+
+Don't forget to import everything into the `tutorial_pipeline.json` file. At the end of this section, your `include` object should look like this (unless you decided to split more files):
+
+```json5
+  include: [
+    "tutorialpack:pipeline_files/main.json",
+    "tutorialpack:pipeline_files/skyshadow.json",
+    "tutorialpack:pipeline_files/composite.json",
+    "tutorialpack:pipeline_files/passes.json"
+  ]
+``` 
+
+> **Quick tip:** the ordering of inclusion usually doesn't matter, except for files with passes as it affects the ordering of the passes.
 
 ## Coding the vertex and fragment shaders
 
@@ -406,7 +425,7 @@ void insert_sort(vec4 color, float depth)
   // Store the index of the current item
   int current = current_length;
   // Store the index of the item before it
-  int before = current_lenght - 1;
+  int before = current_length - 1;
 
   // Only loop if there are items before current, and if the 
   // depth of the item before current is lower (closer)
@@ -471,13 +490,13 @@ void main()
   
   // ... sorting goes here ...
 
-  // Initialize color accumulation
-  vec3 composite_color = vec3(0.0);
+  // Initialize color with the bottom layer
+  vec3 composite_color = color_values[0].rgb;
 
   // Iterate through the array
-  for(int i=0; i < current_length; i++){
+  for(int i=1; i < current_length; i++){
     // Accumulate blended color
-    composite_color += blend_colors(composite_color, color_values[i]);
+    composite_color = blend_colors(composite_color, color_values[i]);
   }
 
 }
@@ -494,4 +513,4 @@ Finally, we write the composite color into the framebuffer:
 
 Your pipeline is now *fabulous*! Now test it and see if clouds and particles render behind stained glass and water.
 
-> **Quick tip:** if your pipeline fail to compile, check to see if you created the images and framebuffers for the layers properly. It is very verbose and it's easy to get lost in walls of text. It's advised to use comments to separate sections of your pipeline file, or split them into multiple files if it's easier for you. Make sure to check for commas and pluralization as well. Those are pretty easy to miss.
+If your pipeline fail to compile, check to see if you created the images and framebuffers for the layers properly. You can also obtain the source code of this tutorial up to this point by cloing this tutorial wiki (the wiki, not the main repo.) This will be our little secret :)
