@@ -122,11 +122,11 @@ This samples the images at the right texture coordinates and put the colors and 
 >
 > Any swizzle mask can be used on any vector, as long as you don't mix them together. For example you can do `color.rgb` or `color.xyz`, but not `color.rgz`. You can also sample the components in arbitrary order, such as `color.bgr`, or `color.yy`. The result of swizzling is a vector with the same length as the swizzle mask.
 
-Now that we've sampled them, the next step is to **sort them by depth**. The way depth works is that things with **lower** depth value are **closer** to the viewer. That means we want to sort the depth from **highest to lowest** before blending the colors together (think of blending as stacking colored transparent sheets. The "first" sheet will be at the bottom of the stack, therefore the farthest from the viewer and its color will be the least visible). By the way, the depth values go from 0.0 to 1.0.
+Now that we've sampled them, the next step is to **sort them by depth**. Objects have **lower** depth when they are **closer** so we need to sort it from **highest to lowest** before blending the colors together.
 
-Sorting is pretty trivial for two layers using just a simple if-branch. For six however, it gets complicated. We need a sorting algorithm to do the job, and it needs to be fast enough while being able to run on the GPU. **Insertion sort** fits that role perfectly. It is also the algorithm used by Mojang in their fabulous graphics shader.
+Sorting is trivial for two layers using just a simple if-branch. For six, we need a sorting algorithm to do the job, one that is fast and able to run on the GPU. **Insertion sort** fits that role perfectly. It is also the algorithm used by Mojang in their fabulous graphics shader.
 
-Let's create an array to contain our layers so we can sort them. We declare it outside, and specifically before, the `main()` function so that the content may be altered by our sorting function.
+Let's create an array to contain our layers so we can sort them. We declare it outside and before the `main()` function so they are scoped globally:
 
 ```glsl
 const int array_length = 6; // GLSL arrays must be fixed-length
