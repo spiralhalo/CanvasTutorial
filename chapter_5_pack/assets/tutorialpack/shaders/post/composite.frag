@@ -29,7 +29,7 @@ void insert_sort(vec4 color, float depth)
     return;
   }
 
-  // Set the value at the next empty index
+  // Store the values at the next empty index
   color_values[current_length] = color;
   depth_values[current_length] = depth;
 
@@ -38,13 +38,14 @@ void insert_sort(vec4 color, float depth)
   // Store the index of the item before it
   int before = current_length - 1;
 
-  // Only loop if there are items before current, and if the 
-  // depth of the item before current is lower (closer)
-  // because we want to short it from highest to lowest depth.
+  // Increment the length of the array
+  current_length ++;
+
+  // Loop while there is an item before the current one
+  // and if that item, importantly, has a lower depth.
   while (current > 0 && depth_values[current] > depth_values[before]) {
 
-    // Inside the loop, the item before is guaranteed to have
-    // higher depth. Let's switch its place with the current item.
+    // Swap the current item with the item before it
     vec4 temp_color = color_values[current];
     float temp_depth = depth_values[current];
     
@@ -58,9 +59,6 @@ void insert_sort(vec4 color, float depth)
     current --;
     before --;
   }
-
-  // Increment the length of the array
-  current_length ++;
 }
 
 vec3 blend_colors(vec3 destination, vec4 source)
