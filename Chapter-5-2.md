@@ -122,7 +122,7 @@ This samples the images at the right texture coordinates and put the colors and 
 >
 > Any swizzle mask can be used on any vector, as long as you don't mix them together. For example you can do `color.rgb` or `color.xyz`, but not `color.rgz`. You can also sample the components in arbitrary order, such as `color.bgr`, or `color.yy`. The result of swizzling is a vector with the same length as the swizzle mask.
 
-Now that we've sampled them, the next step is to **sort them by depth**. Objects have **lower** depth when they are **closer** so we need to sort it from **highest to lowest** before blending the colors together.
+Now that we've sampled them, the next step is to **sort them by depth**. Fragments have **lower** depth when they are **closer** to the viewer so we need to sort it from **highest to lowest** before blending the colors together.
 
 Sorting is trivial for two layers using just a simple if-branch. For six, we need a sorting algorithm to do the job, one that is fast and able to run on the GPU. **Insertion sort** fits that role perfectly. It is also the algorithm used by Mojang in their fabulous graphics shader.
 
