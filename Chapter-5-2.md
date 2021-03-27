@@ -124,7 +124,7 @@ This samples the images at the right texture coordinates and put the colors and 
 
 Now that we've sampled them, the next step is to **sort them by depth**. The way depth works is that things with **lower** depth value are **closer** to the viewer. That means we want to sort the depth from **highest to lowest** before blending the colors together (think of blending as stacking colored transparent sheets. The "first" sheet will be at the bottom of the stack, therefore the farthest from the viewer and its color will be the least visible). By the way, the depth values go from 0.0 to 1.0.
 
-For two layers sorting is pretty trivial with a simple if-branch. For six however, it gets complicated. We need a sorting algorithm to do the job. There are many sorting algorithm to pick for, and if you're a programmer chances are you've learned some of them. For this tutorial, we will simply use **insertion sort**, the same one used by mojang themselves in their fabulous graphics shader.
+Sorting is pretty trivial for two layers using just a simple if-branch. For six however, it gets complicated. We need a sorting algorithm to do the job, and it needs to be fast enough while being able to run on the GPU. **Insertion sort** fits that role perfectly. It is also the algorithm used by Mojang in their fabulous graphics shader.
 
 Let's create an array to contain our layers so we can sort them. We declare it outside, and specifically before, the `main()` function so that the content may be altered by our sorting function.
 
