@@ -57,10 +57,11 @@ Let's create the copy fragment shader because it's easier. As a matter of fact, 
 uniform sampler2D u_source;
 
 in vec2 v_texcoord;
+out vec4 fragColor;
 
 void main()
 {
-  gl_FragData[0] = texture2D(u_source, v_texcoord);
+  fragColor = texture2D(u_source, v_texcoord);
 }
 ```
 
@@ -92,7 +93,9 @@ uniform sampler2D u_clouds_depth;
 uniform sampler2D u_particles_color;
 uniform sampler2D u_particles_depth;
 
-in vec2 v_texcoord;
+in vec2 v_texcoord; // texture uv coordinate input
+
+out vec4 fragColor; // fragment color output
 
 void main()
 {
@@ -242,7 +245,7 @@ Finally, we write the composite color into the framebuffer:
   // Alpha is mostly ignored, but we will set it to one
   // Some post-effects may require the alpha to be set to other value
   // For instance, FXAA3 expects the alpha to contain the luminance of this color
-  gl_FragData[0] = vec4(composite_color, 1.0);
+  fragColor = vec4(composite_color, 1.0);
 ```
 
 Your pipeline is now *fabulous*! Now test it and see if clouds and particles render behind stained glass and water.
