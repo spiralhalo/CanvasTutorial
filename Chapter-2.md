@@ -117,6 +117,8 @@ The concept of model-view-projection matrix is too complex to be explained in th
 
 > **What is a vertex?** A vertex in the context of rendering is an abstract object that makes up the corners of a triangle. A vertex contains positional information, but it can also contain other information added by the renderer such as normals. The vertex shader is responsible for transforming these information and passing them on to the intermediate stage between the vertex and fragment stages.
 
+> **Heads up!** If you're making a pipeline for Canvas `1.17` branch, `gl_ModelViewProjectionMatrix` was removed in core profile. In its place you need to use `frx_guiViewProjectionMatrix()` which is avaiable by importing `frex:shaders/api/view.glsl` to your shader.
+
 ## Making the fragment shader
 
 This time we will work on the `main.frag` file. Just like before, we begin by importing necessary libraries:
