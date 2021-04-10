@@ -196,6 +196,8 @@ void frx_writePipelineVertex(in frx_VertexData data)
 #endif
 in float v_diffuse;
 
+out vec4 fragColor;
+
 // Fragment setup - Most of the time you don't need to modify these
 frx_FragmentData frx_createPipelineFragment()
 {
@@ -255,7 +257,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   color.rgb = mix(color.rgb, original_color, fragData.emissivity);
 
   // Write color data to the color attachment
-  gl_FragData[0] = color;
+  fragColor = color;
   
   // Write position data to the depth attachment
   gl_FragDepth = gl_FragCoord.z;
