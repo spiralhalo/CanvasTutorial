@@ -126,13 +126,15 @@ This time we will work on the `main.frag` file. Just like before, we begin by im
 #include frex:shaders/api/fragment.glsl
 ```
 
-Then we will define the inputs that will receive vanilla lighting data written by the vertex shader, same as before but with `in` keyword instead:
+Then we will define the inputs that will receive vanilla lighting data written by the vertex shader, same as before but with `in` keyword instead. We will also define the fragment color output here:
 
 ```glsl
 #ifdef VANILLA_LIGHTING
   in vec2 v_light;
   in float v_aoShade;
 #endif
+
+out vec4[1] fragColor; // the length is 1 because we only output 1 color
 ```
 
 Next, we want to set up our fragment data. This part is included in the fragment shader to allow pipelines to manipulate fragment data before any material shader could, but for this tutorial we won't be modifying anything so we can treat this part as mostly boilerplate code:
@@ -176,14 +178,14 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   vec4 color = fragData.spriteColor * fragData.vertexColor;
 
   // Write color data to the color attachment
-  gl_FragData[0] = color;
+  fragColor[0] = color;
   
   // Write position data to the depth attachment
   gl_FragDepth = gl_FragCoord.z;
 }
 ```
 
-Notice the `gl_FragData[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
+Notice the `fragColor[0]` and `gl_FragDepth` variables. These are used for writing the color and depth data respectively.
 
 > **What is a fragment?** A fragment is simply an "unprocessed" pixel! The fragment shader is responsible for processing and writing fragments into the framebuffer before they can be displayed as pixels on the screen or sampled as texture by other shaders further down the pipeline.
 
