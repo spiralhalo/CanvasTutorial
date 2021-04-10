@@ -15,6 +15,8 @@ uniform sampler2D u_particles_depth;
 
 in vec2 v_texcoord;
 
+out vec4 fragColor;
+
 const int array_length = 6; // GLSL arrays must be fixed-length
 
 int current_length = 0; // The actual length of array
@@ -102,5 +104,5 @@ void main()
     composite_color = blend_colors(composite_color, color_values[i]);
   }
   
-  gl_FragData[0] = vec4(composite_color, 1.0);
+  fragColor = vec4(composite_color, 1.0);
 }

@@ -9,6 +9,8 @@
 in float v_diffuse;
 in vec4 v_shadowViewPos;
 
+out vec4 fragColor;
+
 // Helper function
 vec3 shadowDist(int cascade)
 {
@@ -126,7 +128,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   color.rgb += noise_glint(frx_normalizeMappedUV(frx_texcoord), frx_matGlint());
 
   // Write color data to the color attachment
-  gl_FragData[0] = color;
+  fragColor = color;
   
   // Write position data to the depth attachment
   gl_FragDepth = gl_FragCoord.z;
