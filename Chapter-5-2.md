@@ -47,6 +47,14 @@ Notice that since the frame shaders shaders aren't interfaced, our shader code d
 
 Essentially, what this shader does is placing the vertexes on the corners of the screen and then outputting the texture coordinates.
 
+**NOTICE FOR 1.17**
+
+`gl_ProjectionMatrix` and `gl_Vertex` were removed in core profile. For Canvas `1.17` branch you need to use `frxu_frameProjectionMatrix` and `in_vertex` respectively. `frxu_frameProjectionMatrix` needs to be declared as `uniform mat4 frxu_frameProjectionMatrix` while `in_vertex` needs to be declared as `in vec4 in_vertext` at the top of the vertex shader (after the header).
+
+**NOTE**
+
+Sometimes your vertex input declaration (`in vec2 in_uv`) might fail due to conflict with Canvas's internal code. This happens when importing `frex:shaders/api/world.glsl`. This is likely a bug and not intended. If this happens you should remove your own input declaration.
+
 ### Creating the copy fragment shader
 
 Let's create the copy fragment shader because it's easier. As a matter of fact, we just need to create a file named `copy.frag` in the `post` folder, and put the following:
