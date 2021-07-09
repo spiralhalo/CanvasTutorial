@@ -49,7 +49,7 @@ Essentially, what this shader does is placing the vertexes on the corners of the
 
 **NOTICE FOR 1.17**
 
-`gl_ProjectionMatrix` and `gl_Vertex` were removed in core profile. For Canvas `1.17` branch you need to use `frxu_frameProjectionMatrix` and `in_vertex` respectively. `frxu_frameProjectionMatrix` needs to be declared as `uniform mat4 frxu_frameProjectionMatrix` while `in_vertex` needs to be declared as `in vec4 in_vertext` at the top of the vertex shader (after the header).
+`gl_ProjectionMatrix` and `gl_Vertex` were removed in core profile. For Canvas `1.17` branch you need to use `frxu_frameProjectionMatrix` and `in_vertex` respectively. `frxu_frameProjectionMatrix` needs to be declared as `uniform mat4 frxu_frameProjectionMatrix` while `in_vertex` needs to be declared as `in vec4 in_vertex` at the top of the vertex shader (after the header).
 
 **IMPORTANT NOTE**
 
