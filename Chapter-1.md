@@ -61,7 +61,7 @@ Next we will create our color information image inside our `images` array. This 
   target: "TEXTURE_2D",
   texParams: [
     {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-    {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"}
+    {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"}
   ]
 }
 ```
@@ -80,7 +80,7 @@ Next we'll add the depth image into our `images` array. In case you are unfamili
   target: "TEXTURE_2D",
   texParams: [ 
     {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-    {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"},
+    {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"},
     {name: "TEXTURE_COMPARE_MODE", val: "NONE"}
   ]
 }
@@ -131,7 +131,7 @@ And we're finally done with our g-buffer! The final content of your main.json fi
       target: "TEXTURE_2D",
       texParams: [
         {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-        {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"}
+        {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"}
       ]
     },
 
@@ -144,7 +144,7 @@ And we're finally done with our g-buffer! The final content of your main.json fi
       target: "TEXTURE_2D",
       texParams: [ 
         {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-        {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"},
+        {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"},
         {name: "TEXTURE_COMPARE_MODE", val: "NONE"}
       ]
     }
