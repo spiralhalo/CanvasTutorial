@@ -86,7 +86,7 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
     vec3 shadowTexCoord = shadowPos.xyz * 0.5 + 0.5;
 
     // Sample the shadow map
-    float directSkyLight = shadow2DArray(frxs_shadowMap, vec4(shadowTexCoord.xy, float(cascade), shadowTexCoord.z)).r;
+    float directSkyLight = texture(frxs_shadowMap, vec4(shadowTexCoord.xy, float(cascade), shadowTexCoord.z));
 
     // Pad the value to prevent absolute darkness
     directSkyLight = 0.65 + 0.45 * directSkyLight;

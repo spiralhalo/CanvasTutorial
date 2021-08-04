@@ -13,7 +13,7 @@ void frx_writePipelineVertex(in frx_VertexData data)
 {
   if (frx_modelOriginType() == MODEL_ORIGIN_SCREEN) {
     // Position of hand and GUI items
-    gl_Position = gl_ModelViewProjectionMatrix * data.vertex;
+    gl_Position = frx_guiViewProjectionMatrix() * data.vertex;
   } else {
     // Position of world objects
     data.vertex += frx_modelToCamera();
