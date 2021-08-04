@@ -1,7 +1,10 @@
 #include tutorialpack:shaders/post/header.glsl
 
+uniform mat4 frxu_frameProjectionMatrix;
+
 in vec4 in_vertex;
 in vec2 in_uv;
+
 out vec2 v_texcoord;
 
 void main()
