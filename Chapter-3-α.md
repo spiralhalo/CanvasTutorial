@@ -5,7 +5,7 @@ We've implemented vanilla lighting and make our pipeline playable with, but we s
 * Hurt flash
 * Enchantment glint
 
-For the last item we want to apply the glint texture, but unfortunately Canvas doesn't support it at the moment. Instead we will use the Lumi Lights shader implementation of glint.
+For the last item we want to apply the glint texture, but unfortunately Canvas doesn't support it at the moment. Instead we will use the Lumi Lights shader implementation of glint. **Update: Canvas now supports it. I will update the tutorial soon™ with how to implement it.**
 
 Let's create a folder called `lib` in our `shaders` folder to store our library files.
 
