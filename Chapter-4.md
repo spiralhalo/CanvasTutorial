@@ -50,8 +50,8 @@ Now let's create our sky shadow configuration file. Create a file called `skysha
       texParams: [
         {name: "TEXTURE_MIN_FILTER", val: "LINEAR"},
         {name: "TEXTURE_MAG_FILTER", val: "LINEAR"},
-        {name: "TEXTURE_WRAP_S", val: "CLAMP"},
-        {name: "TEXTURE_WRAP_T", val: "CLAMP"},
+        {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"},
+        {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"},
         {name: "TEXTURE_COMPARE_MODE", val: "COMPARE_REF_TO_TEXTURE"},
         {name: "TEXTURE_COMPARE_FUNC", val: "LEQUAL"}
       ]
