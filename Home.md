@@ -10,6 +10,10 @@ Both of these are loaded as minecraft resources contained in a resource pack. A 
 
 Specifically, we're going to make a **shadow-enabled pipeline** with **volumetric lights** and **translucency compositing** from scratch. That is right, from scratch! Well, almost from scratch due to the code examples, but we won't be using Canvas's default pipeline because the goal of this tutorial is to teach basic understanding of how the entire pipeline is built from start to finish.
 
+# License
+
+The text of this tutorial and its code examples are licensed under [CC0 license](https://creativecommons.org/publicdomain/zero/1.0/deed.en).
+
 # Table of Contents
 
 ### [[1: First stop: the G buffer|Chapter 1]]
