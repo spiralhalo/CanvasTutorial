@@ -1,3 +1,9 @@
+# Warning
+
+**THIS TUTORIAL IS OUTDATED.**
+
+Proceed with caution. Check with https://github.com/vram-guild/frex/wiki to have the latest API specification. I will eventually update this or make a new tutorial in its place.
+
 # So you want to make a Canvas pipeline huh?
 
 **A pipeline? No, I want to make a shader pack!**
