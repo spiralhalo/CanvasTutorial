@@ -4,7 +4,7 @@
 
 If you've followed this tutorial so far, you should have a working pipeline that renders unshaded minecraft world. Now let's add some lighting to make it more playable.
 
-All shading process will happen in our pipeline fragment shader. For optimization we can move this process into a deferred shading pass later, but for now we will do it in the G-buffer pass for simplicity. Another advantage for doing it in the G-buffer pass is that the shading will be applied to all objects including objects behind translucent layer.
+All shading process will happen in our pipeline fragment shader. For optimization we can move this process into a deferred shading pass later, but for now we will do it in the G-buffer pass for simplicity. Another advantage for doing it in the G-buffer pass is that the shading will be applied to all objects including objects behind translucent layers.
 
 To apply the lighting, we will add a lighting operation block inside the write pipeline fragment function in our fragment shader. We will add it right after color calculation as shown here:
 
@@ -13,9 +13,8 @@ To apply the lighting, we will add a lighting operation block inside the write p
 // ...
 
 // This is the function that we've created earlier
-void frx_writePipelineFragment(in frx_FragmentData fragData)
-{
-  vec4 color = fragData.spriteColor * fragData.vertexColor;
+void frx_pipelineFragment() {
+  vec4 color = frx_fragColor;
   
   // LIGHTING OPERATION CODE GOES HERE
 ```
@@ -23,47 +22,43 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 First we start the lighting operation by sampling the light map using the light coordinates input:
 
 ```glsl
-  // Always wrap vanilla lighting-related operation within #ifdef VANILLA_LIGHTING directive
-  #ifdef VANILLA_LIGHTING
-
-    // Obtain vanilla light color from the light map
-    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
+  // Obtain vanilla light color from the light map
+  vec3 lightmap = texture(frxs_lightmap, frx_fragLight.xy).rgb;
 ```
+> If you're new to GLSL, or if you're coming from an old version like GLSL 120, we use the `texture` built-in function to access GPU memory to read a specific image. This is usually the most espensive part of the shading process, but because the Minecraft lightmap texture is so small, it's very cheap; performance cost scales with resolution.
 
 Next we will multiply the light color with the ambient occlusion factor. We only do it for objects with ambient occlusion enabled:
 
 ```glsl
-    if (fragData.ao) {
-      light_color *= fragData.aoShade;
-    }
+  if(frx_fragEnableAo) {
+    lightmap *= frx_fragLight.z;
+  }
 ```
 
 Finally we multiply the fragment color with the light color to apply the lighting data:
 ```glsl
-    color.rgb *= light_color;
+  color.rgb *= lightmap;
 ```
 
-Once we close the `#ifdef` directive, our whole lighting operation will look like this:
+Once we finish that last multiplication, our lighting operation will look like this:
 ```glsl
-  // Always wrap vanilla lighting operation within #ifdef VANILLA_LIGHTING directive
-  #ifdef VANILLA_LIGHTING
+  // Obtain vanilla light color from the light map
+  vec3 lightmap = texture(frxs_lightmap, frx_fragLight.xy).rgb;
 
-    // Obtain vanilla light color
-    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
+  // Multiply it by ambient occlusion factor
+  if(frx_fragEnableAo) {
+    lightmap *= frx_fragLight.z;
+  }
 
-    // Multiply it by ambient occlusion factor
-    if (fragData.ao) {
-      light_color *= fragData.aoShade;
-    }
-
-    // Finally, multiply the fragment color by the light color
-    color.rgb *= light_color;
-  #endif
+  // Finally, multiply the fragment color by the light color
+  color.rgb *= lightmap;
 ```
 
-You can test your pipeline to see if everything is rendering as expected.
+This code can be optimized slightly, but for the sake of the tutorial, its goal is to be more readable.
 
-> **Pro-tip:** Press `F3+A` to trigger chunk reload which will also recompile your pipeline! You can also set Canvas reload shortcut key in Controls option.
+Once you have the lighting code in your fragment shader, you can test your pipeline to see if everything is rendering as expected.
+
+> **Pro-tip:** Press `=` to quickly recompile your pipeline! You can also set a different Canvas reload shortcut key in Controls. I prefer setting it to `r`.
 
 ## Non-flat lighting trick: Fake diffuse
 
@@ -71,17 +66,16 @@ Now that we've applied the lighting data, you may notice that the lighting still
 
 To do this, we need the normal vector of the object. A normal vector is simply a vector that points at the direction a particular face is facing. For example, a cube has 6 faces that points upwards, northwards, eastwards, and so on. Using this information, we will be able to darken a particular face that points to a particular direction.
 
-The normal vector is stored in the vertex. We can transport this information to the fragment, but for now it's much cheaper to simply transport the fake diffuse value. Hence we will do our fake diffuse calculation in the **vertex shader**.
+We can do our fake diffuse calculation in the **fragment shader**, right before we multiply the color by the lightmap.
 
 Since we want our objects to be brighter on top, we start by calculating how much the normal vector is pointing up. This can be done with a dot product:
 
 ```glsl
-// main.vert
+// main.frag
 // ...
-void frx_writePipelineVertex(in frx_VertexData data)
-{
+void frx_pipelineFragment() {
   // ...
-  float pointing_up = dot(data.normal, vec3(0.0, 1.0, 0.0));
+  float diffuseFactor = dot(frx_vertexNormal, vec3(0.0, 1.0, 0.0));
   // ...
 ```
 
@@ -90,34 +84,26 @@ You can learn more about dot products (and vectors) in the field of Linear Algeb
 Note that the result of a unit-vector dot product is in the range of [-1, 1]. We don't want negative lighting value, so we will bring our value up into the [0, 1] range:
 
 ```glsl
-  pointing_up = pointing_up * 0.5 + 0.5;
+  diffuseFactor = diffuseFactor * 0.5 + 0.5;
 ```
 
-Finally, we write this value into a diffuse output. To prevent absolute darkness, let's pad this value by 0.3. The calculation will look like this:
+Finally, we want to prevent absolute darkness, let's pad this value by 0.3. The calculation will look like this:
 
 ```glsl
-  v_diffuse = 0.3 + 0.7 * pointing_up;
+  diffuseFactor = 0.3 + 0.7 * diffuseFactor;
 ```
 
-Don't forget to define the new input/output at the beginning of both the vertex and fragment shader:
-```glsl
-// Vertex shader
-out float v_diffuse; // Our new diffuse vertex output
-
-// Fragment shader
-in float v_diffuse; // Our new diffuse fragment input
-```
-
-Finally, in the **fragment shader**, apply our fake diffuse value to the fragment color. We only do this with objects that are marked as diffuse-enabled:
+Finally, we want to apply our fake diffuse value to the lightmap before we apply lighting to the color. We only do this with objects that are marked as diffuse-enabled:
 
 ```glsl
   // ... lighting calculation goes here ...
 
-  if (fragData.diffuse) {
-    color.rgb *= v_diffuse;
+  // Apply diffuse shading only if the material specifies it
+  if (frx_fragEnableDiffuse) {
+    lightmap *= diffuseFactor;
   }
 
-  // ... writing to the g-buffer goes here ...
+  // ... multiply color by lightmap goes here ...
 ```
 
 Now test your shader once again to see if the fake diffuse is applied properly.
@@ -126,62 +112,33 @@ Now test your shader once again to see if the fake diffuse is applied properly.
 
 The last step into completing the quasi-vanilla lighting is to apply emissivity. Emissive objects emit light, therefore all the previous lighting and diffuse multiplication shouldn't apply to them. There are various ways to do this, but the simplest way it so simply mix our final color with the original color before any lighting is applied.
 
-First, in the fragment shader, we store the original color in a new variable:
-
-```glsl
-void frx_writePipelineFragment(in frx_FragmentData fragData)
-{
-  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
-  vec4 color = fragData.spriteColor * fragData.vertexColor;
-
-  // Store this unshaded color for later use
-  vec3 original_color = color.rgb;
-
-  // ...
-```
-
-And then, just before writing the color into the G-buffer, we will interpolate the original color based on the emissivity value of this fragment:
+We do this by interpolating the lightmap before we apply lighting, based on emission:
 
 ```glsl
   // ... applying diffuse goes here ...
 
-  color.rgb = mix(color.rgb, original_color, fragData.emissivity);
+  // Emissive objects are at full brightness
+  lightmap = mix(lightmap, vec3(1.0), frx_fragEmissive);
 
-  // ... writing to the g-buffer goes here ...
+  // ... multiply color by lightmap goes here ...
 ```
 
-Once we completed everything in this chapter, our final shader should look like this:
+Once we completed everything in this chapter, our final shader program should look like this:
 
 `main.vert`:
 ```glsl
 #include frex:shaders/api/vertex.glsl
 #include frex:shaders/api/view.glsl
 
-#ifdef VANILLA_LIGHTING
-  out vec2 v_light;
-  out float v_aoShade;
-#endif
-out float v_diffuse;
-
-void frx_writePipelineVertex(in frx_VertexData data)
-{
-  if (frx_modelOriginType() == MODEL_ORIGIN_SCREEN) {
+void frx_pipelineVertex() {
+  if (frx_modelOriginScreen) {
     // Position of hand and GUI items
-    gl_Position = gl_ModelViewProjectionMatrix * data.vertex;
+    gl_Position = frx_guiViewProjectionMatrix * frx_vertex;
   } else {
     // Position of world objects
-    data.vertex += frx_modelToCamera();
-    gl_Position = frx_viewProjectionMatrix() * data.vertex;
+    frx_vertex += frx_modelToCamera;
+    gl_Position = frx_viewProjectionMatrix * frx_vertex;
   }
-
-  float pointing_up = dot(data.normal, vec3(0.0, 1.0, 0.0));
-  pointing_up = pointing_up * 0.5 + 0.5;
-  v_diffuse = 0.3 + 0.7 * pointing_up;
-
-  #ifdef VANILLA_LIGHTING
-    v_light = data.light;
-    v_aoShade = data.aoShade;
-  #endif
 }
 ```
 
@@ -190,71 +147,43 @@ void frx_writePipelineVertex(in frx_VertexData data)
 #include frex:shaders/api/material.glsl
 #include frex:shaders/api/fragment.glsl
 
-#ifdef VANILLA_LIGHTING
-  in vec2 v_light;
-  in float v_aoShade;
-#endif
-in float v_diffuse;
+// In the case of multiple color attachments, you use different layout qualifiers.
+layout(location = 0) out vec4 fragColor;
 
-out vec4 fragColor;
+void frx_pipelineFragment() {
+  // Variables prefixed with frx_ are parts of the API. 
+  // In this case, since we included frex:shaders/api/fragment.glsl, 
+  // we get access to most of the information we would want in the G-Buffer program.
+  //
+  // frx_fragColor refers to the Minecraft texture color, 
+  // already multiplied with the vertex color so we can use it just like this.
+  vec4 color = frx_fragColor;
 
-// Fragment setup - Most of the time you don't need to modify these
-frx_FragmentData frx_createPipelineFragment()
-{
-#ifdef VANILLA_LIGHTING
-  return frx_FragmentData (
-    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
-    frx_color,
-    frx_matEmissive() ? 1.0 : 0.0,
-    !frx_matDisableDiffuse(),
-    !frx_matDisableAo(),
-    frx_normal,
-    v_light,
-    v_aoShade
-  );
-#else
-  return frx_FragmentData (
-    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
-    frx_color,
-    frx_matEmissive() ? 1.0 : 0.0,
-    !frx_matDisableDiffuse(),
-    !frx_matDisableAo(),
-    frx_normal
-  );
-#endif
-}
-// End of fragment setup
+  // Obtain vanilla light color from the light map
+  vec3 lightmap = texture(frxs_lightmap, frx_fragLight.xy).rgb;
 
-void frx_writePipelineFragment(in frx_FragmentData fragData)
-{
-  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
-  vec4 color = fragData.spriteColor * fragData.vertexColor;
-    
-  // Store this unshaded color for later use
-  vec3 original_color = color.rgb;
-  
-  // Always wrap vanilla lighting operation within #ifdef VANILLA_LIGHTING directive
-  #ifdef VANILLA_LIGHTING
-
-    // Obtain vanilla light color
-    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
-
-    // Multiply it by ambient occlusion factor
-    if (fragData.ao) {
-      light_color *= fragData.aoShade;
-    }
-
-    // Finally, multiply the fragment color by the light color
-    color.rgb *= light_color;
-  #endif
-
-  // Multiply the color once more with the diffuse shading
-  if (fragData.diffuse) {
-    color.rgb *= v_diffuse;
+  // Multiply it by ambient occlusion factor
+  if(frx_fragEnableAo) {
+    lightmap *= frx_fragLight.z;
   }
 
-  // Apply emissivity
-  color.rgb = mix(color.rgb, original_color, fragData.emissivity);
+  // Find out how much this surface is facing up
+  float diffuseFactor = dot(frx_vertexNormal, vec3(0.0, 1.0, 0.0));
+
+  // Normalize the diffuse factor and add a padding of 0.3
+  diffuseFactor = diffuseFactor * 0.5 + 0.5;
+  diffuseFactor = 0.3 + 0.7 * diffuseFactor;
+
+  // Apply diffuse shading only if the material specifies it
+  if (frx_fragEnableDiffuse) {
+    lightmap *= diffuseFactor;
+  }
+
+  // Emissive objects are at full brightness
+  lightmap = mix(lightmap, vec3(1.0), frx_fragEmissive);
+
+  // Finally, multiply the fragment color by the light color
+  color.rgb *= lightmap;
 
   // Write color data to the color attachment
   fragColor = color;
@@ -263,3 +192,5 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   gl_FragDepth = gl_FragCoord.z;
 }
 ```
+
+If no errors popped up, you should see a Minecraft world that looks mostly like Vanilla! Otherwise, you may want to retrace your steps and find out if you went wrong somewhere.

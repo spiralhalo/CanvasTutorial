@@ -36,3 +36,7 @@ fragColor = color; // <- the new version
 // fragColor[2] = color3; // etc...
 
 ```
+
+## January 9, 2023
+
+My (Ambrosia) attempt to update this to the latest Canvas specifications, specifically FREX 6 and Canvas 1.18+.

@@ -32,14 +32,18 @@ The content of this shader looks like this:
 ```glsl
 #include tutorialpack:shaders/post/header.glsl
 
+in vec4 in_vertex;
 in vec2 in_uv;
-out vec2 v_texcoord;
 
-void main()
-{
-  vec4 screen = gl_ProjectionMatrix * vec4(gl_Vertex.xy * frxu_size, 0.0, 1.0);
-  gl_Position = vec4(screen.xy, 0.2, 1.0);
-  v_texcoord = in_uv;
+uniform mat4 frxu_frameProjectionMatrix;
+
+out vec2 texcoord;
+
+void main() {
+    vec2 screen = (frxu_frameProjectionMatrix * vec4(in_vertex.xy * frxu_size, 0.0, 1.0)).xy;
+
+    gl_Position = vec4(screen, 0.2, 1.0);
+    texcoord = in_uv;
 }
 ```
 
@@ -47,29 +51,23 @@ Notice that since the frame shaders shaders aren't interfaced, our shader code d
 
 Essentially, what this shader does is placing the vertexes on the corners of the screen and then outputting the texture coordinates.
 
-**NOTICE FOR 1.17**
-
-`gl_ProjectionMatrix` and `gl_Vertex` were removed in core profile. For Canvas `1.17` branch you need to use `frxu_frameProjectionMatrix` and `in_vertex` respectively. `frxu_frameProjectionMatrix` needs to be declared as `uniform mat4 frxu_frameProjectionMatrix` while `in_vertex` needs to be declared as `in vec4 in_vertex` at the top of the vertex shader (after the header).
-
-**IMPORTANT NOTE**
-
-Sometimes your vertex input declaration (`in vec2 in_uv`) might fail due to conflict with Canvas's internal code. This happens when importing `frex:shaders/api/world.glsl`. This is likely a bug and not intended. If this happens you should remove your own input declaration.
+> **IMPORTANT NOTE**: Sometimes your vertex input declaration (`in vec2 in_uv`) might fail due to conflict with Canvas's internal code. This happens when importing `frex:shaders/api/world.glsl`. This is likely a bug and not intended. If this happens you should remove your own input declaration.
 
 ### Creating the copy fragment shader
 
-Let's create the copy fragment shader because it's easier. As a matter of fact, we just need to create a file named `copy.frag` in the `post` folder, and put the following:
+Let's create the copy fragment shader first because it's easier. As a matter of fact, we just need to create a file named `copy.frag` in the `post` folder, and put the following:
 
 ```glsl
 #include tutorialpack:shaders/post/header.glsl
 
 uniform sampler2D u_source;
 
-in vec2 v_texcoord;
-out vec4 fragColor;
+in vec2 texcoord;
 
-void main()
-{
-  fragColor = texture2D(u_source, v_texcoord);
+layout(location = 0) out vec4 fragColor;
+
+void main() {
+  fragColor = texture(u_source, texcoord);
 }
 ```
 
@@ -101,24 +99,24 @@ uniform sampler2D u_clouds_depth;
 uniform sampler2D u_particles_color;
 uniform sampler2D u_particles_depth;
 
-in vec2 v_texcoord; // texture uv coordinate input
+in vec2 texcoord; // texture uv coordinate input
 
-out vec4 fragColor; // fragment color output
+layout(location = 0) out vec4 fragColor; // fragment color output
 
 void main()
 {
-  vec4  main_color        = texture2D(u_main_color       , v_texcoord);
-  float main_depth        = texture2D(u_main_depth       , v_texcoord).r;
-  vec4  translucent_color = texture2D(u_translucent_color, v_texcoord);
-  float translucent_depth = texture2D(u_translucent_depth, v_texcoord).r;
-  vec4  entity_color      = texture2D(u_entity_color     , v_texcoord);
-  float entity_depth      = texture2D(u_entity_depth     , v_texcoord).r;
-  vec4  weather_color     = texture2D(u_weather_color    , v_texcoord);
-  float weather_depth     = texture2D(u_weather_depth    , v_texcoord).r;
-  vec4  clouds_color      = texture2D(u_clouds_color     , v_texcoord);
-  float clouds_depth      = texture2D(u_clouds_depth     , v_texcoord).r;
-  vec4  particles_color   = texture2D(u_particles_color  , v_texcoord);
-  float particles_depth   = texture2D(u_particles_depth  , v_texcoord).r;
+  vec4  main_color        = texture(u_main_color       , texcoord);
+  float main_depth        = texture(u_main_depth       , texcoord).r;
+  vec4  translucent_color = texture(u_translucent_color, texcoord);
+  float translucent_depth = texture(u_translucent_depth, texcoord).r;
+  vec4  entity_color      = texture(u_entity_color     , texcoord);
+  float entity_depth      = texture(u_entity_depth     , texcoord).r;
+  vec4  weather_color     = texture(u_weather_color    , texcoord);
+  float weather_depth     = texture(u_weather_depth    , texcoord).r;
+  vec4  clouds_color      = texture(u_clouds_color     , texcoord);
+  float clouds_depth      = texture(u_clouds_depth     , texcoord).r;
+  vec4  particles_color   = texture(u_particles_color  , texcoord);
+  float particles_depth   = texture(u_particles_depth  , texcoord).r;
 
   // Composite logic goes here
 }
@@ -153,8 +151,7 @@ Next, we will create the insertion sort function. Explaining insertion sort is a
 ```glsl
 // ... array definition goes here ...
 
-void insert_sort(vec4 color, float depth)
-{
+void insert_sort(vec4 color, float depth) {
   // Filter out fully transparent pixel
   if (color.a == 0.0) {
     return;
@@ -217,11 +214,10 @@ void main()
 }
 ```
 
-And finally, now that the layers are sorted in the arrays, we blend them together. The blending function being used is "one, one minus source alpha." I don't actually know why and I can't explain why, but it's that way and it just works™️. It is again defined outside and before `main()`, and it looks like this:
+And finally, now that the layers are sorted in the arrays, we blend them together. The blending function being used is "one, one minus source alpha." This is simply linear interpolation. If you wish, you can try more advanced types of blending than alpha blending such as multiplicative blending, but that is out of scope for this tutorial. It is again defined outside and before `main()`, and it looks like this:
 
 ```glsl
-vec3 blend_colors(vec3 destination, vec4 source)
-{
+vec3 blend_colors(vec3 destination, vec4 source) {
   return source.rgb + destination * (1.0 - source.a);
 }
 ```
@@ -236,12 +232,12 @@ void main()
   // ... sorting goes here ...
 
   // Initialize color with the bottom layer
-  vec3 composite_color = color_values[0].rgb;
+  vec3 composite = color_values[0].rgb;
 
   // Iterate through the array
   for(int i=1; i < current_length; i++){
     // Accumulate blended color
-    composite_color = blend_colors(composite_color, color_values[i]);
+    composite = blend_colors(composite, color_values[i]);
   }
 
 }
@@ -253,11 +249,13 @@ Finally, we write the composite color into the framebuffer:
   // Alpha is mostly ignored, but we will set it to one
   // Some post-effects may require the alpha to be set to other value
   // For instance, FXAA3 expects the alpha to contain the luminance of this color
-  fragColor = vec4(composite_color, 1.0);
+  fragColor = vec4(composite, 1.0);
 ```
 
 Your pipeline is now *fabulous*! Now test it and see if clouds and particles render behind stained glass and water.
 
 If your pipeline fail to compile, check to see if you created the images and framebuffers for the layers properly.You can also obtain the source code of this tutorial up to this point by cloning this tutorial wiki (the wiki, not the main repo. You can get the `.git` url in the sidebar.) This will be our little secret.
+
+TODO: update source code 
 
 ![winktater](winktater.png)
