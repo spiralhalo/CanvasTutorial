@@ -186,7 +186,7 @@ So, we want our composite pass to sample the G-buffer, which includes the solid 
 1. Composite pass
 2. Copy pass (copies composite result to the solid layer)
 
-> **Pro-tip:** You don't need the copy pass when you have **even** number of `fabulous` passes. However using the copy pass anyway makes it easier to debug and reorganize when necessary.
+> **Pro-tip:** You don't need the copy pass when you have **even** number of `fabulous` passes. However using the copy pass anyway makes it easier to debug and reorganize when necessary. The copy pass is used to avoid the dreadful situation where you read from and write to the same texture, which causes many nightmareish side effects.
 
 ### Creating the shader program configurations
 
@@ -194,7 +194,7 @@ We need to create new shader programs for our frame passes, namely the composite
 
 A program requires a framebuffer to write into, and a framebuffer requires image attachments. This might get complicated, so let's create our configurations in a new file in `pipeline_files` called `composite.json`.
 
-In this file, let's create arrays to store our images, framebuffers, and programs:
+The contents of this file should feel a bit familiar with how much work we've been doing with Canvas so far. In this file, we'll create arrays to store our images, framebuffers, and programs:
 
 ```json5
 {

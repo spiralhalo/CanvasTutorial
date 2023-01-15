@@ -22,6 +22,7 @@ Now let's create our sky shadow configuration file. Create a file called `skysha
 
 ```json5
 {
+  // Don't change this name
   skyShadows: {
     framebuffer: "shadow",
     allowEntities: true,
@@ -95,7 +96,7 @@ So our `include` array would look like this:
 
 ## Making the shadow pass shader program
 
-The shader code for the shadow pass is straightforward. We simply transform the vertexes in the vertex shader and write the depth value in the fragment shader. The difference is instead of using the camera's transformation we use the shadow transformations.
+The shader code for the shadow pass is straightforward. We simply transform the vertexes in the vertex shader and write the depth value in the fragment shader. The difference is instead of using the camera's transformation we use the shadow transformations so that we see the world from the point of view of the sun.
 
 The shader files will be named `shadow.vert` and `shadow.frag`. We will put them in our `gbuffer` folder. The contents of these files are as follows:
 
@@ -107,10 +108,9 @@ The shader files will be named `shadow.vert` and `shadow.frag`. We will put them
 // Cascade level that is currently rendering, 0-3
 uniform int frxu_cascade;
 
-void frx_writePipelineVertex(in frx_VertexData data)
-{
+void frx_pipelineVertex() {
   // Move to camera origin
-  vec4 shadowVertex = data.vertex + frx_modelToCamera();
+  vec4 shadowVertex = frx_vertex + frx_modelToCamera;
   gl_Position = frx_shadowViewProjectionMatrix(frxu_cascade) * shadowVertex;
 }
 ```
@@ -120,16 +120,8 @@ void frx_writePipelineVertex(in frx_VertexData data)
 #include frex:shaders/api/material.glsl
 #include frex:shaders/api/fragment.glsl
 
-frx_FragmentData frx_createPipelineFragment()
-{
-  return frx_FragmentData (
-    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
-    frx_color
-  );
-}
-
-void frx_writePipelineFragment(in frx_FragmentData fragData)
-{
+void frx_pipelineFragment() {
+  // Shadow pass only cares about depth
   gl_FragDepth = gl_FragCoord.z;
 }
 ```
@@ -140,43 +132,46 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
 
 Now that we've set up the sky shadow configuration, a shadow map will be generated at the beginning of each frame. There are two ways to sample the shadow map in the G-buffer pass:
 
-* `frxs_shadow map` to sample using the `shadow2DArray` function. This is the easiest way to sample the shadow map for most purposes.
-* `frxs_shadow mapTexture` to sample the shadow map directly. For advanced use.
+* `frxs_shadowMap` to sample the shadow map using GPU hardware accelerated interpolation, so you get smooth shadows for low performance cost
+* `frxs_shadowMapTexture` to sample the shadow map directly. For advanced use.
 
 To sample the shadow map we need the coordinates of an object in the **shadow-space**. This is where the shadow transformations will come in handy.
 
-First, we will create a new input/ouput both in our vertex and fragment shaders (Remember, these are the `main.vert` and `main.frag` files):
+First, we will create an input/ouput both in our vertex and fragment shaders (Remember, these are the `main.vert` and `main.frag` files):
 
 ```glsl
 // Vertex shader
-out vec4 v_shadowViewPos;
+out vec4 shadowViewPos;
 
 // Fragment shader
-in vec4 v_shadowViewPos;
+in vec4 shadowViewPos;
 ```
+> **Note**: This is how you exchange data between the vertex and fragment shader - they are called in/out variables or "varying" variables. The names should correspond between both shaders, and the use of in/out should reflect the nature of the variable - if it is set in the vertex shader and read in the fragment shader, the vertex shader will use the `out` qualifier while the fragment shader will use the `in` qualifier.
 
 Next, just after the camera transformations in the **vertex shader**, we will calculate the shadow view-space coordinate and write it into the new output:
 
 ```glsl
   // ... camera trasnformation goes here ...
 
-  v_shadowViewPos = frx_shadowViewMatrix() * data.vertex;
+  shadowViewPos = frx_shadowViewMatrix * vec4(frx_vertex.xyz + frx_vertexNormal.xyz * 0.1, frx_vertex.w);
 
   // ...
 ```
+
+Don't worry about the math here, it is for something called **shadow bias**. You'll learn about it later, but this is just a preemptive measure to prevent it from becoming a problem.
 
 That's all that we need to do in the vertex level. Notice that we haven't taken the shadow cascade level into consideration. We will do it in the fragment level.
 
 In our fragment shader, we will obtain a cascade-specific shadow-space coordinate for each fragment. This is done by transforming the shadow view-space coordinate with the shadow projection matrix of the corresponding cascade. Before we can do that, we need to know which cascade level each fragment falls into.
 
-This operation is quite elaborate and Canvas-specific, so we will borrow a function from Canvas's default shader that does exactly that. We will put this function just above the `frx_createPipelineFragment` function in our fragment shader:
+This operation is quite elaborate and Canvas-specific, so we will borrow a function from Canvas's default shader that does exactly that. We will put this function just above the `frx_pipelineFragment()` function in our fragment shader:
 
 ```glsl
 // Helper function
 vec3 shadowDist(int cascade)
 {
   vec4 c = frx_shadowCenter(cascade);
-  return abs((c.xyz - v_shadowViewPos.xyz) / c.w);
+  return abs((c.xyz - shadowViewPos.xyz) / c.w);
 }
 
 // Function for obtaining the cascade level
@@ -198,13 +193,15 @@ int selectShadowCascade()
 
   return cascade;
 }
+
+// ... pipeline fragment function goes here ...
 ```
 
 Now we can obtain the shadow-space coordinate for the current fragment. We won't do that just yet, but the code looks like this:
 
 ```glsl
 // Obtain shadow-space position
-vec4 shadowPos = frx_shadowProjectionMatrix(cascade) * v_shadowViewPos;
+vec4 shadowPos = frx_shadowProjectionMatrix(cascade) * shadowViewPos;
 
 // Transform into texture coordinates
 vec3 shadowTexCoord = shadowPos.xyz * 0.5 + 0.5;
@@ -214,93 +211,99 @@ vec3 shadowTexCoord = shadowPos.xyz * 0.5 + 0.5;
 
 There are many ways to apply shadows. In a PBR rendering pipeline, the shadow calculation will only be applied to direct sun light calculation, without affecting ambient light.
 
-In vanilla lighting, there are only block light and sky light values. One obvious way to apply the shadow is to alter the sky light value somehow. For simplicity, we will simply **replace the sky light value** with the value obtained from sampling the shadowmap.
+In vanilla lighting, there are only block light and sky light values. One obvious way to apply the shadow is to alter the sky light value somehow. For simplicity, we will simply **blend the sky light value** with the value obtained from sampling the shadowmap.
 
 > **Quick-tip:** Feel free to come up with a more elaborate method after finishing this chapter! It will be a good exercise to reinforce your understanding of shading.
 
 Recall the following code in our fragment shader:
 
 ```glsl
-  #ifdef VANILLA_LIGHTING
+  // Obtain vanilla light color from the light map
+  vec3 lightmap = texture(frxs_lightmap, frx_fragLight.xy).rgb;
 
-    // Obtain vanilla light color
-    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
+  // Multiply it by ambient occlusion factor
+  if(frx_fragEnableAo) {
+    lightmap *= frx_fragLight.z;
+  }
 
-    // Multiply it by ambient occlusion factor
-    if (fragData.ao) {
-      light_color *= fragData.aoShade;
-    }
+  // Find out how much this surface is facing up
+  float diffuseFactor = dot(frx_vertexNormal, vec3(0.0, 1.0, 0.0));
 
-    // Finally, multiply the fragment color by the light color
-    color.rgb *= light_color;
-  #endif
+  // Normalize the diffuse factor and add a padding of 0.3
+  diffuseFactor = diffuseFactor * 0.5 + 0.5;
+  diffuseFactor = 0.3 + 0.7 * diffuseFactor;
+
+  // Apply diffuse shading only if the material specifies it
+  if (frx_fragEnableDiffuse) {
+    lightmap *= diffuseFactor;
+  }
+
+  // Emissive objects are at full brightness
+  lightmap = mix(lightmap, vec3(1.0), frx_fragEmissive);
+
+  // Finally, multiply the fragment color by the light color
+  color.rgb *= lightmap;
 ```
 
-This is the part of the fragment shader that handles shading. Notice that we use the `fragData.light` vector in order to sample the light color from the light map.
+This is the part of the fragment shader that handles shading. Notice that we use the `frx_fragLight` vector in order to sample the light color from the light map.
 
-The `fragData.light` is a 2-dimensional vector where the `x` value represents the **block light** while the `y` value represents the **sky light**. We want to replace the sky light with our shadow value, so we simply add the following code before sampling the light map:
+The `frx_fragLight` is a 3-dimensional vector where the `x` value represents the **block light**, the `y` value represents the **sky light**, and the `z` value represents the AO shading. We want to blend the sky light with our shadow value, so we simply add the following code before sampling the light map:
 
 ```glsl
   // Obtain the cascade level
   int cascade = selectShadowCascade();
 
   // Obtain shadow-space position
-  vec4 shadowPos = frx_shadowProjectionMatrix(cascade) * v_shadowViewPos;
+  vec4 shadowPos = frx_shadowProjectionMatrix(cascade) * shadowViewPos;
 
   // Transform into texture coordinates
   vec3 shadowTexCoord = shadowPos.xyz * 0.5 + 0.5;
 
   // Sample the shadow map
-  float directSkyLight = shadow2DArray(frxs_shadowMap, vec4(shadowTexCoord.xy, float(cascade), shadowTexCoord.z)).r;
+  float directSkyLight = texture(frxs_shadowMap, vec4(shadowTexCoord.xy, cascade, shadowTexCoord.z));
 
   // Pad the value to prevent absolute darkness
   directSkyLight = 0.3 + 0.7 * directSkyLight;
 
-  // Clip to 0.96875 because of how light map works
-  directSkyLight = min(0.96875, directSkyLight);
-
-  // Replace the sky light
-  fragData.light.y = directSkyLight;
+  // Blend with the sky light using a simple multiply
+  fragData.light.y *= directSkyLight;
 
   // ... sampling the light map goes here ...
 ```
 
 Now when you test the pipeline you should see some shadows in the world!
 
-> **Why does my shadow sometimes disappear when I look away?** This is a know Canvas issue. Be patient and wait for it to get fixed.
+> **Why does my shadow sometimes disappear when I look away?** In `Options / Video Settings / Canvas / Debug`, set Shadow Priming Strategy to `TIERED` and `Disable Shadow Self-Occlusion` to `true`. This will minimize shadow flickering.
 
 ### Adjusting the fake diffuse
 
-Recall the following fake diffuse calculation in the vertex shader:
+Recall the following fake diffuse calculation:
 
 ```glsl
-  float pointing_up = dot(data.normal, vec3(0.0, 1.0, 0.0));
-  pointing_up = pointing_up * 0.5 + 0.5;
-  v_diffuse = 0.3 + 0.7 * pointing_up;
+  // Find out how much this surface is facing up
+  float diffuseFactor = dot(frx_vertexNormal, vec3(0.0, 1.0, 0.0));
 ```
 
 In this fake diffuse code, we specifically made it so that faces that point up are shaded more brightly. Since we've added shadows, it makes more sense if the faces that **points towards the sky light** are shaded more brightly instead. 
 
-This can be achieved by utilizing the `frx_skyLightVector()` which as the name implies, represents a vector that points towards the skylight. The change to be made is quite straightforward:
+This can be achieved by utilizing the `frx_skyLightVector` which as the name implies, represents a vector that points towards the skylight. The change to be made is quite straightforward:
 
 ```glsl
-  float pointing_to_light = dot(data.normal, frx_skyLightVector());
+  float diffuseFactor = dot(frx_vertexNormal, frx_skyLightVector);
 ```
 
 However, there is a precaution that comes with this. First of all, not all dimensions have a sky light source. Secondly, we still want GUI items to use the original fake diffuse. Therefore, we will add some checks so that the final code will look like this:
 
 ```glsl
-  float pointing_to_light;
-  if (frx_worldFlag(FRX_WORLD_HAS_SKYLIGHT) && !frx_isGui()) {
-    pointing_to_light = dot(data.normal, frx_skyLightVector());
+  float diffuseFactor;
+  if (frx_isGui) {
+    diffuseFactor = dot(frx_vertexNormal, frx_skyLightVector);
   } else {
-    pointing_to_light = dot(data.normal, vec3(0.0, 1.0, 0.0));
+    diffuseFactor = dot(frx_vertexNormal, vec3(0.0, 1.0, 0.0));
   }
-  pointing_to_light = pointing_to_light * 0.5 + 0.5;
-  v_diffuse = 0.3 + 0.7 * pointing_to_light;
 ```
 
-Last but not least, we need to import the Frex World API in order to access the `frx_worldFlag` and `frx_skyLightVector` functions. We add the following item to our list of `include`s at the beginning of the vertex shader file:
+To access the `frx_skyLightVector`, we need to include FREX's world API, which we should have already done when adding the enchantment glint, but if not, you'll want to make sure it's added with the rest of your includes.
 
 ```glsl
 #include frex:shaders/api/world.glsl
@@ -318,4 +321,4 @@ To remedy this, Canvas allow pipeline configuration to tilt the sky light zenith
   }
 ```
 
-You can add this item in the pipeline json or the sky shadow configuration json, whichever makes more sense to you.
+You can add this item in the pipeline json or the sky shadow configuration json; whichever makes more sense to you.

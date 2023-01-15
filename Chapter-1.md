@@ -37,7 +37,7 @@ Another thing to note, the folders `pipeline_files` and `shaders` also don't hav
 
 Remember that our G-buffer consists of color and depth information. In the pipeline configuration, these will be defined as **Images** which are pipeline objects that represent textures in the back end.
 
-First, make a json file called `main.json` inside your `pipeline_files` folder. The content of this file is a root object with an `images` **array** object inside it like this:
+First, make a json file called `main.json5` inside your `pipeline_files` folder. The content of this file is a root object with an `images` **array** object inside it like this:
 
 ```json5
 {
@@ -46,8 +46,7 @@ First, make a json file called `main.json` inside your `pipeline_files` folder. 
   ]
 }
 ```
-
-NB: Canvas pipeline files uses Json5 so we don't need to put quotes around object names and we can use comments as well as trailing commas in our json files.
+NB: Canvas pipeline files uses Json5 so we don't need to put quotes around object names and we can use comments as well as trailing commas. You can create Json5 files by simply using the `.json5` extension rather than `.json`.
 
 Next we will create our color information image inside our `images` array. This image will be a standard 24-bit RGBA format image (8-bit for each color + alpha). We will name our color image `main_color`, so the image object will look like this:
 
