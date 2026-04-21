@@ -65,10 +65,10 @@
   },
 
   include: [
-    "tutorialpack:pipeline_files/main.json",
-    "tutorialpack:pipeline_files/skyshadow.json",
-    "tutorialpack:pipeline_files/fabulous_layers.json",
-    "tutorialpack:pipeline_files/composite.json",
-    "tutorialpack:pipeline_files/passes.json",
+    "tutorialpack:pipeline_files/main.json5",
+    "tutorialpack:pipeline_files/skyshadow.json5",
+    "tutorialpack:pipeline_files/fabulous_layers.json5",
+    "tutorialpack:pipeline_files/composite.json5",
+    "tutorialpack:pipeline_files/passes.json5",
   ]
 }

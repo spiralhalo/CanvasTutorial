@@ -2,10 +2,6 @@
 #include frex:shaders/api/fragment.glsl
 #include tutorialpack:shaders/lib/glintify.glsl
 
-#ifdef VANILLA_LIGHTING
-  in vec2 v_light;
-  in float v_aoShade;
-#endif
 in float v_diffuse;
 in vec4 v_shadowViewPos;
 
@@ -38,38 +34,11 @@ int selectShadowCascade()
   return cascade;
 }
 
-// Fragment setup - Most of the time you don't need to modify these
-frx_FragmentData frx_createPipelineFragment()
+void frx_pipelineFragment()
 {
-#ifdef VANILLA_LIGHTING
-  return frx_FragmentData (
-    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
-    frx_color,
-    frx_matEmissive() ? 1.0 : 0.0,
-    !frx_matDisableDiffuse(),
-    !frx_matDisableAo(),
-    frx_normal,
-    v_light,
-    v_aoShade
-  );
-#else
-  return frx_FragmentData (
-    texture2D(frxs_baseColor, frx_texcoord, frx_matUnmippedFactor() * -4.0),
-    frx_color,
-    frx_matEmissive() ? 1.0 : 0.0,
-    !frx_matDisableDiffuse(),
-    !frx_matDisableAo(),
-    frx_normal
-  );
-#endif
-}
-// End of fragment setup
-
-void frx_writePipelineFragment(in frx_FragmentData fragData)
-{
-  // Obtain true color by multiplying sprite color (usually texture) and vertex color (usually biome color)
-  vec4 color = fragData.spriteColor * fragData.vertexColor;
-    
+  // Base fragment color is the result of texture and vertex color multiplication
+  vec4 color = frx_fragColor;
+  
   // Store this unshaded color for later use
   vec3 original_color = color.rgb;
   
@@ -95,14 +64,14 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
     directSkyLight = min(0.96875, directSkyLight);
 
     // Replace the sky light
-    fragData.light.y = directSkyLight;
+    frx_fragLight.y = directSkyLight;
 
     // Obtain vanilla light color
-    vec3 light_color = texture2D(frxs_lightmap, fragData.light).rgb;
+    vec3 light_color = texture(frxs_lightmap, frx_fragLight.xy).rgb;
 
     // Multiply it by ambient occlusion factor
-    if (fragData.ao) {
-      light_color *= fragData.aoShade;
+    if (frx_fragEnableAo) {
+      light_color *= frx_fragLight.z;
     }
 
     // Finally, multiply the fragment color by the light color
@@ -110,22 +79,22 @@ void frx_writePipelineFragment(in frx_FragmentData fragData)
   #endif
 
   // Multiply the color once more with the diffuse shading
-  if (fragData.diffuse) {
+  if (frx_fragEnableDiffuse) {
     color.rgb *= v_diffuse;
   }
 
-  // Apply emissivity
-  color.rgb = mix(color.rgb, original_color, fragData.emissivity);
+  // Apply emissive
+  color.rgb = mix(color.rgb, original_color, frx_fragEmissive);
 
   // Apply flash and hurt effect
-  if (frx_matFlash()) {
+  if (frx_matFlash == 1) {
     color.rgb = color.rgb * 0.25 + 0.75;
-  } else if (frx_matHurt()) {
+  } else if (frx_matHurt == 1) {
     color.rgb = vec3(0.25, 0.0, 0.0) + color.rgb * 0.75;
   }
 
   // Apply glint shader
-  color.rgb += noise_glint(frx_normalizeMappedUV(frx_texcoord), frx_matGlint());
+  color.rgb += noise_glint(frx_normalizeMappedUV(frx_texcoord), frx_matGlint);
 
   // Write color data to the color attachment
   fragColor = color;

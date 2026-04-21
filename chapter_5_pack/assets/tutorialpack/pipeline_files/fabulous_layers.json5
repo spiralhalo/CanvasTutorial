@@ -1,0 +1,9 @@
+{
+  include: [
+    "tutorialpack:pipeline_files/fabulous/translucent.json5",
+    "tutorialpack:pipeline_files/fabulous/entity.json5",
+    "tutorialpack:pipeline_files/fabulous/weather.json5",
+    "tutorialpack:pipeline_files/fabulous/clouds.json5",
+    "tutorialpack:pipeline_files/fabulous/particles.json5"
+  ]
+}

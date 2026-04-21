@@ -8,5 +8,5 @@ out vec4 fragColor;
 
 void main()
 {
-  fragColor = texture2D(u_source, v_texcoord);
+  fragColor = texture(u_source, v_texcoord);
 }

@@ -70,18 +70,18 @@ vec3 blend_colors(vec3 destination, vec4 source)
 
 void main()
 {
-  vec4  main_color        = texture2D(u_main_color       , v_texcoord);
-  float main_depth        = texture2D(u_main_depth       , v_texcoord).r;
-  vec4  translucent_color = texture2D(u_translucent_color, v_texcoord);
-  float translucent_depth = texture2D(u_translucent_depth, v_texcoord).r;
-  vec4  entity_color      = texture2D(u_entity_color     , v_texcoord);
-  float entity_depth      = texture2D(u_entity_depth     , v_texcoord).r;
-  vec4  weather_color     = texture2D(u_weather_color    , v_texcoord);
-  float weather_depth     = texture2D(u_weather_depth    , v_texcoord).r;
-  vec4  clouds_color      = texture2D(u_clouds_color     , v_texcoord);
-  float clouds_depth      = texture2D(u_clouds_depth     , v_texcoord).r;
-  vec4  particles_color   = texture2D(u_particles_color  , v_texcoord);
-  float particles_depth   = texture2D(u_particles_depth  , v_texcoord).r;
+  vec4  main_color        = texture(u_main_color       , v_texcoord);
+  float main_depth        = texture(u_main_depth       , v_texcoord).r;
+  vec4  translucent_color = texture(u_translucent_color, v_texcoord);
+  float translucent_depth = texture(u_translucent_depth, v_texcoord).r;
+  vec4  entity_color      = texture(u_entity_color     , v_texcoord);
+  float entity_depth      = texture(u_entity_depth     , v_texcoord).r;
+  vec4  weather_color     = texture(u_weather_color    , v_texcoord);
+  float weather_depth     = texture(u_weather_depth    , v_texcoord).r;
+  vec4  clouds_color      = texture(u_clouds_color     , v_texcoord);
+  float clouds_depth      = texture(u_clouds_depth     , v_texcoord).r;
+  vec4  particles_color   = texture(u_particles_color  , v_texcoord);
+  float particles_depth   = texture(u_particles_depth  , v_texcoord).r;
 
   // The solid layer is special. We don't want it to be
   // potentially rejected by the function.

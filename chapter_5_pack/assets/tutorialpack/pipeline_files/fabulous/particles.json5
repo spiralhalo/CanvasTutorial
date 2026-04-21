@@ -1,7 +1,7 @@
 {
   images: [
     {
-      name: "clouds_color",
+      name: "particles_color",
       lod: 0,
       internalFormat: "RGBA8",
       pixelFormat: "RGBA",
@@ -9,12 +9,12 @@
       target: "TEXTURE_2D",
       texParams: [
         {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-        {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"}
+        {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"}
       ]
     },
 
     {
-      name: "clouds_depth",
+      name: "particles_depth",
       lod: 0,
       internalFormat: "DEPTH_COMPONENT",
       pixelFormat: "DEPTH_COMPONENT",
@@ -22,7 +22,7 @@
       target: "TEXTURE_2D",
       texParams: [ 
         {name: "TEXTURE_MIN_FILTER", val: "NEAREST"}, {name: "TEXTURE_MAG_FILTER", val: "NEAREST"},
-        {name: "TEXTURE_WRAP_S", val: "CLAMP"}, {name: "TEXTURE_WRAP_T", val: "CLAMP"},
+        {name: "TEXTURE_WRAP_S", val: "CLAMP_TO_EDGE"}, {name: "TEXTURE_WRAP_T", val: "CLAMP_TO_EDGE"},
         {name: "TEXTURE_COMPARE_MODE", val: "NONE"}
       ]
     }
@@ -30,17 +30,17 @@
 
   framebuffers: [
     {
-      name: "clouds_gbuffer",
-      depthAttachment: {image: "clouds_depth", clearDepth: 1.0},
+      name: "particles_gbuffer",
+      depthAttachment: {image: "particles_depth", clearDepth: 1.0},
       colorAttachments: [
-        {image: "clouds_color", clearColor: 0x00000000}
+        {image: "particles_color", clearColor: 0x00000000}
       ]
     },
     
     {
-      name: "clouds_unmanaged",
-      depthAttachment: {image: "clouds_depth"},
-      colorAttachments: [{image: "clouds_color"}]
+      name: "particles_unmanaged",
+      depthAttachment: {image: "particles_depth"},
+      colorAttachments: [{image: "particles_color"}]
     }
   ]
 }
